@@ -28,7 +28,7 @@ class RootHandler implements RequestHandlerInterface
 
         $response = new Response(StatusCodeInterface::STATUS_OK);
         $response = $response->withHeader('Content-Type', 'application/json');
-        $response->getBody()->write(json_encode(['msg' => "Hello $name"]));
+        $response->getBody()->write(json_encode(['msg' => "Hello $name"], JSON_THROW_ON_ERROR));
         return $response;
     }
 }
