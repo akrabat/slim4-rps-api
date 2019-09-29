@@ -52,7 +52,7 @@ final class GameRepository
         $row = $this->connection->fetchAssoc($sql, ['id' => $gameId->toString()]);
 
         if ($row === false) {
-            throw new NotFoundException();
+            throw new NotFoundException("Game not found");
         }
 
         return Game::fromState($row);

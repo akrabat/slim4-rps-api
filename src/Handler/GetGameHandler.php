@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Handler;
 
+use App\Model\Exception\NotFoundException;
 use App\Model\GameRepository;
 use App\Transformer\GameTransformer;
 use Psr\Http\Message\ResponseInterface;
@@ -11,6 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use RKA\ContentTypeRenderer\HalRenderer;
+use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Response;
 
 final class GetGameHandler implements RequestHandlerInterface
@@ -31,7 +33,11 @@ final class GetGameHandler implements RequestHandlerInterface
         $id = $request->getAttribute('id');
         $this->logger->info("Listing games", ['id' => $id]);
 
-        $games = $this->gameRepository->loadById($id);
+        try {
+            $games = $this->gameRepository->loadById($id);
+        } catch (NotFoundException $e) {
+            throw new HttpNotFoundException($request, $e->getMessage(), $e);
+        }
 
         $transformer = new GameTransformer();
         $hal = $transformer->transformItem($games);
