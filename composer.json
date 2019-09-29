@@ -31,6 +31,7 @@
     "require": {
         "akrabat/rka-content-type-renderer": "^1.0",
         "beberlei/assert": "^3.2",
+        "doctrine/dbal": "^2.9",
         "monolog/monolog": "^2.0",
         "nocarrier/hal": "^0.9.12",
         "php-di/php-di": "^6.0",
@@ -41,6 +42,7 @@
     }
     ,
     "require-dev": {
+        "doctrine/migrations": "^2.1",
         "phpstan/phpstan": "^0.11.16",
         "phpunit/phpunit": "^8.3",
         "roave/security-advisories": "dev-master",
@@ -48,6 +50,10 @@
         "thecodingmachine/phpstan-safe-rule": "^0.1.4"
     },
     "scripts": {
-        "check": "phpcs && phpunit && phpstan analyse"
+        "check": "phpcs && phpunit && phpstan analyse",
+        "generate-migration": "vendor/bin/doctrine-migrations migrations:generate",
+        "migrate": "vendor/bin/doctrine-migrations migrations:migrate",
+        "migrations": "vendor/bin/doctrine-migrations",
+        "seed": "vendor/bin/doctrine-migrations seed:rcopmon"
     }
 }

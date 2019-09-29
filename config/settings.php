@@ -16,6 +16,11 @@ return static function (string $appEnv) {
             'path' => 'php://stderr',
             'level' => Logger::DEBUG,
         ],
+
+        'db' => [
+            'path' => __DIR__ . '/../db/rps.db',
+            'driver' => 'pdo_sqlite',
+        ]
     ];
 
     if ($appEnv === 'DEVELOPMENT') {

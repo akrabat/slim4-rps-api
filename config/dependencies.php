@@ -3,11 +3,15 @@
 declare(strict_types=1);
 
 use DI\ContainerBuilder;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+
+use function DI\autowire;
 
 return static function (ContainerBuilder $containerBuilder, array $settings) {
     $containerBuilder->addDefinitions([
@@ -25,6 +29,17 @@ return static function (ContainerBuilder $containerBuilder, array $settings) {
             $logger->pushHandler($handler);
 
             return $logger;
+        },
+
+        Connection::class  => static function (ContainerInterface $c) {
+            $params = $c->get('settings')['db'];
+
+            $connection = DriverManager::getConnection($params);
+            if (strpos($params['driver'], 'sqlite') === 0) {
+                $connection->exec('PRAGMA foreign_keys = ON');
+            }
+
+            return $connection;
         },
     ]);
 };
