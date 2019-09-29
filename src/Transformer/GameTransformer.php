@@ -12,7 +12,47 @@ use Nocarrier\HalLink;
 
 final class GameTransformer implements Transformer
 {
-    public function transformItem(Entity $object): Hal
+    public function transformItem(Entity $game): Hal
+    {
+        /** @var Game $game */
+        // $self = '/games/' . $game->getGameId()->toString();
+        $self = null;
+        $data = [
+            'player1' => $game->getPlayer1(),
+            'player2' => $game->getPlayer2(),
+            'status' => $game->getStatus()->description(),
+            'created' => $game->getCreated()->format('Y-m-d H:i:s'),
+        ];
+        $links = $this->getLinksForGame($game);
+
+        $resource = new Hal($self, $data);
+        foreach ($links as $name => $link) {
+            $resource->addHalLink($name, $link);
+        }
+        return $resource;
+    }
+
+    /**
+     * @param Entity[] $objects
+     * @return Hal
+     */
+    public function transformCollection(array $objects): Hal
+    {
+        $hal = new Hal('/games');
+
+        $count = 0;
+        foreach ($objects as $object) {
+            $count++;
+            $hal->addResource('game', $this->transformItem($object));
+        }
+
+        $hal->setData(['count' => $count]);
+
+        return $hal;
+    }
+
+
+    public function transform(Game $object): Hal
     {
         /** @var Game $object */
         $state = $object->state();
@@ -49,22 +89,33 @@ final class GameTransformer implements Transformer
         return $resource;
     }
 
-    /**
-     * @param Entity[] $objects
-     * @return Hal
-     */
-    public function transformCollection(array $objects): Hal
+    private function getLinksForGame(Game $game)
     {
-        $hal = new Hal('/games');
+        $links = [];
+        $gameId = $game->getGameId()->toString();
+        switch ($game->getStatus()->toString()) {
+            case GameStatus::CREATED:
+                $links['makeNextMove'] = new HalLink('/games/' . $gameId . '/moves',
+                    ['description' => "Make a player's move"]);
+                break;
 
-        $count = 0;
-        foreach ($objects as $object) {
-            $count++;
-            $hal->addResource('game', $this->transform($object));
+            case GameStatus::PLAYER1_PLAYED:
+                $player = '2';
+                $links['makeNextMove'] = new HalLink('/games/' . $gameId . '/moves',
+                    ['description' => "Make player $player's move"]);
+                break;
+
+            case GameStatus::PLAYER2_PLAYED:
+                $player = '1';
+                $links['makeNextMove'] = new HalLink('/games/' . $gameId . '/moves',
+                    ['description' => "Make player $player's move"]);
+                break;
+
+            case GameStatus::COMPLETE;
+                $state = $game->result();
+                $links['newGame'] = new HalLink('/games/', ['description' => 'Start a new game']);
         }
 
-        $hal->setData(['count' => $count]);
-
-        return $hal;
+        return $links;
     }
 }

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Handler;
 
-use App\Model\Game;
-use App\Model\GameId;
 use App\Model\GameRepository;
 use App\Transformer\GameTransformer;
 use Psr\Http\Message\ResponseInterface;
@@ -15,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use RKA\ContentTypeRenderer\HalRenderer;
 use Slim\Psr7\Response;
 
-final class CreateGameHandler implements RequestHandlerInterface
+final class ListGamesHandler implements RequestHandlerInterface
 {
     private $logger;
     private $renderer;
@@ -30,16 +28,13 @@ final class CreateGameHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $data = $request->getParsedBody();
-        $this->logger->info("Creating a new game", ['data' => $data]);
+        $params = $request->getQueryParams();
+        $this->logger->info("Listing games", ['queryParams' => $params]);
 
-        $gameId = GameId::fromUuid();
-        $game = Game::newGame($gameId, $data);
-
-        $this->gameRepository->add($game);
+        $games = $this->gameRepository->fetch();
 
         $transformer = new GameTransformer();
-        $hal = $transformer->transform($game);
+        $hal = $transformer->transformCollection($games);
 
         $response = new Response(201);
         $response = $this->renderer->render($request, $response, $hal);

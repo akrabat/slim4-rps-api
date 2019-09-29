@@ -24,4 +24,19 @@ final class GameRepository
         $data = $game->state();
         $this->connection->insert($this->tableName, $data);
     }
+
+    /**
+     * @return Game[]
+     */
+    public function fetch(): array
+    {
+        $sql = 'SELECT * from ' . $this->tableName . ' ORDER BY created';
+        $rows = $this->connection->fetchAll($sql);
+
+        $results = array_map(function ($row) {
+            return Game::fromState($row);
+        }, $rows);
+
+        return $results;
+    }
 }

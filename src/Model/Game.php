@@ -27,7 +27,7 @@ final class Game implements Entity
 
     private function __construct()
     {
-        $this->created = new DateTimeImmutable();
+        $this->created = new DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $this->player1Move = new GameMove(GameMove::NOT_PLAYED);
         $this->player2Move = new GameMove(GameMove::NOT_PLAYED);
         $this->status = new GameStatus(GameStatus::CREATED);
@@ -42,6 +42,31 @@ final class Game implements Entity
         $game->player1 = $data['player1'];
         $game->player2 = $data['player2'];
         return $game;
+    }
+
+    public function getGameId(): GameId
+    {
+        return $this->gameId;
+    }
+
+    public function getPlayer1(): string
+    {
+        return $this->player1;
+    }
+
+    public function getPlayer2(): string
+    {
+        return $this->player2;
+    }
+
+    public function getStatus(): GameStatus
+    {
+        return $this->status;
+    }
+
+    public function getCreated(): DateTimeImmutable
+    {
+        return $this->created;
     }
 
     public function result()
