@@ -6,5 +6,5 @@ use App\Handler\RootHandler;
 use Slim\App;
 
 return static function (App $app) {
-    $app->get('/[{name}]', RootHandler::class)->setName('root');
+    $app->get('/', RootHandler::class)->setName('root');
 };

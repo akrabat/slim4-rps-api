@@ -25,30 +25,14 @@ class RootHandlerTest extends TestCase
             ->with('Root handler dispatched');
     }
 
-    public function testReturnsHelloWorldWhenNoNameProvided()
+    public function testReturnsLinks()
     {
         $request = $this->createMock(ServerRequestInterface::class);
 
         $rootHandler = new RootHandler($this->logger);
         $response = $rootHandler->handle($request);
 
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertSame(json_encode(['msg' => 'Hello world']), (string)$response->getBody());
-    }
-
-    public function testReturnsCorrectMessageWhenNameProvided()
-    {
-        $name = 'Foo';
-        $request = $this->createMock(ServerRequestInterface::class);
-        $request
-            ->expects($this->once())
-            ->method('getQueryParams')
-            ->willReturn(['name' => $name]);
-
-        $rootHandler = new RootHandler($this->logger);
-        $response = $rootHandler->handle($request);
-
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertSame(json_encode(['msg' => "Hello $name"]), (string)$response->getBody());
+        $result = json_decode((string)$response->getBody(), true);
+        $this->assertSame(['links' => ['games' => '/games']], $result);
     }
 }

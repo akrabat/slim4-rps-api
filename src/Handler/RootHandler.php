@@ -26,11 +26,18 @@ class RootHandler implements RequestHandlerInterface
     {
         $this->logger->info('Root handler dispatched');
 
-        $name = $request->getQueryParams()['name'] ?? 'world';
-
         $response = new Response(StatusCodeInterface::STATUS_OK);
         $response = $response->withHeader('Content-Type', 'application/json');
-        $response->getBody()->write(json_encode(['msg' => "Hello $name"]));
+        $response->getBody()->write(
+            json_encode(
+                [
+                'links' => [
+                    'games' => '/games'
+                    ],
+                ],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            )
+        );
         return $response;
     }
 }
