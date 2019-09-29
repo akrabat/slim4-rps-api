@@ -6,15 +6,46 @@ namespace App\Transformer;
 
 use App\Model\Entity;
 use App\Model\Game;
+use App\Model\GameStatus;
 use Nocarrier\Hal;
+use Nocarrier\HalLink;
 
 final class GameTransformer implements Transformer
 {
     public function transformItem(Entity $object): Hal
     {
-        $data = $object->state();
+        /** @var Game $object */
+        $state = $object->state();
+        $gameId = $state['game_id'];
 
-        $resource = new Hal('/games/' . $data['game_id'], $data);
+        $self = '/games/' . $gameId;
+        $links = [];
+        $data = [];
+
+        switch($state['status']) {
+            case GameStatus::CREATED:
+                $links['makeNextMove'] = new HalLink('/games/' . $gameId .'/moves', ['description' => "Make a player's move"]);
+                break;
+
+            case GameStatus::PLAYER1_PLAYED:
+                $player = '2';
+                $links['makeNextMove'] = new HalLink('/games/' . $gameId .'/moves', ['description' => "Make player $player's move"]);
+                break;
+
+            case GameStatus::PLAYER2_PLAYED:
+                $player = '1';
+                $links['makeNextMove'] = new HalLink('/games/' . $gameId .'/moves', ['description' => "Make player $player's move"]);
+                break;
+
+            case GameStatus::COMPLETE;
+                $state = $object->result();
+                $links['newGame'] = new HalLink('/games/', ['description' => 'Start a new game']);
+        }
+
+        $resource = new Hal($self, $data);
+        foreach ($links as $name => $link) {
+            $resource->addHalLink($name, $link);
+        }
         return $resource;
     }
 
@@ -24,7 +55,7 @@ final class GameTransformer implements Transformer
      */
     public function transformCollection(array $objects): Hal
     {
-        $hal = new Hal('/authors');
+        $hal = new Hal('/games');
 
         $count = 0;
         foreach ($objects as $object) {

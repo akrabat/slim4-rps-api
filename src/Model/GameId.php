@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Assert\Assertion;
-use Ramsey\Uuid\UuidInterface;
+use Ramsey\Uuid\Uuid;
 
 final class GameId
 {
@@ -18,9 +18,12 @@ final class GameId
         $this->id = $id;
     }
 
-    public static function fromUuid(UuidInterface $id): GameId
+    /**
+     * @throws \Exception
+     */
+    public static function fromUuid(): GameId
     {
-        return new self($id->toString());
+        return new self(Uuid::uuid4()->toString());
     }
 
     public static function fromString(string $id): GameId
