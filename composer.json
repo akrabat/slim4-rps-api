@@ -29,8 +29,12 @@
         }
     },
     "require": {
+        "akrabat/rka-content-type-renderer": "^1.0",
+        "beberlei/assert": "^3.2",
         "monolog/monolog": "^2.0",
+        "nocarrier/hal": "^0.9.12",
         "php-di/php-di": "^6.0",
+        "ramsey/uuid": "^3.8",
         "slim/psr7": "^0.5.0",
         "slim/slim": "^4.2",
         "thecodingmachine/safe": "^0.1.16"
