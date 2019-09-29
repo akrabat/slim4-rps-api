@@ -1,4 +1,5 @@
 parameters:
+  inferPrivatePropertyTypeFromConstructor: true
   level: max
   paths:
     - src

@@ -8,10 +8,10 @@ use Assert\Assertion;
 
 final class GameStatus
 {
-    public const CREATED        ='CREATED';
-    public const PLAYER1_PLAYED ='PLAYER1_PLAYED';
-    public const PLAYER2_PLAYED ='PLAYER2_PLAYED';
-    public const COMPLETE       ='COMPLETE';
+    public const CREATED        = 'CREATED';
+    public const PLAYER1_PLAYED = 'PLAYER1_PLAYED';
+    public const PLAYER2_PLAYED = 'PLAYER2_PLAYED';
+    public const COMPLETE       = 'COMPLETE';
 
     public static $validStatuses = ['CREATED', 'PLAYER1_PLAYED', 'PLAYER2_PLAYED', 'COMPLETE'];
     private $status;
@@ -37,5 +37,12 @@ final class GameStatus
         ];
 
         return $descriptions[$this->status];
+    }
+
+    public function is(string $status): bool
+    {
+        Assertion::choice($status, self::$validStatuses);
+
+        return $status === $this->status;
     }
 }

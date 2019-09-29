@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Model\Exception\NotFoundException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 
 final class GameRepository
 {
     private $tableName = 'games';
+
+    /** @var Connection  */
+    private $connection;
 
     public function __construct(Connection $connection)
     {
@@ -38,5 +42,19 @@ final class GameRepository
         }, $rows);
 
         return $results;
+    }
+
+    public function loadById($id): Game
+    {
+        $gameId = GameId::fromString($id);
+
+        $sql = 'SELECT * from ' . $this->tableName . ' WHERE game_id = :id';
+        $row = $this->connection->fetchAssoc($sql, ['id' => $gameId->toString()]);
+
+        if ($row === false) {
+            throw new NotFoundException();
+        }
+
+        return Game::fromState($row);
     }
 }

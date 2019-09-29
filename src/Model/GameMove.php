@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Assert\Assertion;
+use Assert\AssertionFailedException;
 
 final class GameMove
 {
@@ -16,6 +17,9 @@ final class GameMove
     public static $validMoves = ['NOT_PLAYED', 'ROCK', 'PAPER', 'SCISSORS'];
     private $move;
 
+    /**
+     * @throws AssertionFailedException
+     */
     public function __construct(string $move)
     {
         Assertion::choice($move, self::$validMoves);
