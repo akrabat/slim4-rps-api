@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<ruleset name="Slim 4 RPS API coding standard">
+    <description>Slim 4 RPS API coding standard</description>
+
+    <!-- command line arguments -->
+    <arg value="p" />
+    <arg name="colors" />
+    <arg name="extensions" value="php" />
+
+    <!-- Rules -->
+    <rule ref="PSR12"/>
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace" />
+
+    <!-- Paths to check -->
+    <file>config</file>
+    <file>src</file>
+</ruleset>
