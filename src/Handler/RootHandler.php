@@ -11,6 +11,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Psr7\Response;
 
+use function Safe\json_encode;
+
 class RootHandler implements RequestHandlerInterface
 {
     private $logger;
@@ -28,7 +30,7 @@ class RootHandler implements RequestHandlerInterface
 
         $response = new Response(StatusCodeInterface::STATUS_OK);
         $response = $response->withHeader('Content-Type', 'application/json');
-        $response->getBody()->write(json_encode(['msg' => "Hello $name"], JSON_THROW_ON_ERROR));
+        $response->getBody()->write(json_encode(['msg' => "Hello $name"]));
         return $response;
     }
 }
