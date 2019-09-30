@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use Assert\Assert;
 use Assert\Assertion;
+use Assert\AssertionFailedException;
 use DateTimeImmutable;
 use RuntimeException;
 
@@ -32,6 +32,10 @@ final class Game implements Entity
     /** @var DateTimeImmutable */
     private $created;
 
+    /**
+     * @throws \Assert\AssertionFailedException
+     * @throws \Exception
+     */
     private function __construct()
     {
         $this->created = new DateTimeImmutable('now', new \DateTimeZone('UTC'));
@@ -42,7 +46,7 @@ final class Game implements Entity
 
     public static function newGame(GameId $gameId, array $data): Game
     {
-        self::validate($data);
+        self::validateNewGameData($data);
 
         $game = new Game();
         $game->gameId = $gameId;
@@ -116,6 +120,37 @@ final class Game implements Entity
     }
 
     /**
+     * Make a move
+     */
+    public function makeMove(array $data)
+    {
+        $this->validateMakeMoveData($data);
+
+        $move = new GameMove($data['move']);
+        $player = $data['player'];
+
+        if ($player === $this->player1) {
+            if ($this->player1Move->toString() !== GameMove::NOT_PLAYED) {
+                throw ValidationException::withMessages(['player' => 'player 1 has already made their move']);
+            }
+            $this->player1Move = $move;
+        } else {
+            if ($this->player2Move->toString() !== GameMove::NOT_PLAYED) {
+                throw ValidationException::withMessages(['player' => 'player 2 has already made their move']);
+            }
+            $this->player2Move = $move;
+        }
+        $this->status = new GameStatus(GameStatus::IN_PROGRESS);
+
+        if (
+            $this->player1Move->toString() !== GameMove::NOT_PLAYED
+            && $this->player2Move->toString() !== GameMove::NOT_PLAYED
+        ) {
+            $this->status = new GameStatus(GameStatus::COMPLETE);
+        }
+    }
+
+    /**
      * Return an array representing the state of this entity. The keys match the database columns.
      */
     public function state(): array
@@ -158,9 +193,9 @@ final class Game implements Entity
     }
 
     /**
-     * Validate data from user
+     * Validate data from user to create a new game
      */
-    private static function validate(array $data): void
+    private static function validateNewGameData(array $data): void
     {
         $messages = [];
         if (!array_key_exists('player1', $data)) {
@@ -168,6 +203,30 @@ final class Game implements Entity
         }
         if (!array_key_exists('player2', $data)) {
             $messages['player2'] = 'player2 is missing';
+        }
+
+        if (!empty($messages)) {
+            throw ValidationException::withMessages($messages);
+        }
+    }
+
+    /**
+     * Validate data from user to make a move
+     */
+    private function validateMakeMoveData(array $data): void
+    {
+        $messages = [];
+        if (!array_key_exists('move', $data)) {
+            $messages['move'] = 'move is missing';
+        } elseif (!in_array(strtoupper($data['move']), GameMove::$validNextMoves, true)) {
+            $messages['move'] = "move is not one of '"
+                . implode("', '", array_map('strtolower', GameMove::$validNextMoves)) . "'";
+        }
+
+        if (!array_key_exists('player', $data)) {
+            $messages['player'] = 'player is missing';
+        } elseif (!in_array($data['player'], [$this->player1, $this->player2], true)) {
+            $messages['player'] = 'player is not part of this game';
         }
 
         if (!empty($messages)) {

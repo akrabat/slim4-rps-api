@@ -15,6 +15,7 @@ final class GameMove
     public const SCISSORS = 'SCISSORS';
 
     public static $validMoves = ['NOT_PLAYED', 'ROCK', 'PAPER', 'SCISSORS'];
+    public static $validNextMoves = ['ROCK', 'PAPER', 'SCISSORS'];
     private $move;
 
     /**
@@ -22,6 +23,7 @@ final class GameMove
      */
     public function __construct(string $move)
     {
+        $move = strtoupper($move);
         Assertion::choice($move, self::$validMoves);
         $this->move = $move;
     }

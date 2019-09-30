@@ -15,3 +15,8 @@ Create a game:
 List games:
 
     curl -i -H "Accept: application/json" http://localhost:8888/games
+
+Make moves:
+
+    curl -i -H "Accept: application/json" -H "Content-Type: application/json" \
+      -d '{"player": "Rob", "move": "rock"}' http://localhost:8888/games/f548aae6-3f4f-4c7f-a5fc-c0c1099411f7/moves

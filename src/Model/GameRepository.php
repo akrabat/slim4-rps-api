@@ -30,6 +30,21 @@ final class GameRepository
     }
 
     /**
+     * @throws DBALException
+     */
+    public function update(Game $game)
+    {
+        $data = $game->state();
+        $this->connection->update(
+            $this->tableName,
+            $data,
+            [
+                'game_id' => $data['game_id']
+            ]
+        );
+    }
+
+    /**
      * @return Game[]
      */
     public function fetch(): array

@@ -6,6 +6,7 @@ namespace App\Transformer;
 
 use App\Model\Entity;
 use App\Model\Game;
+use App\Model\GameMove;
 use App\Model\GameStatus;
 use App\Model\MatchResult;
 use Nocarrier\Hal;
@@ -91,16 +92,11 @@ final class GameTransformer
                 );
                 break;
 
-            case GameStatus::PLAYER1_PLAYED:
-                $player = '2';
-                $links['makeNextMove'] = new HalLink(
-                    '/games/' . $gameId . '/moves',
-                    ['description' => "Make player $player's move"]
-                );
-                break;
-
-            case GameStatus::PLAYER2_PLAYED:
+            case GameStatus::IN_PROGRESS:
                 $player = '1';
+                if ($game->getPlayer2Move()->toString() == GameMove::NOT_PLAYED) {
+                    $player = '2';
+                }
                 $links['makeNextMove'] = new HalLink(
                     '/games/' . $gameId . '/moves',
                     ['description' => "Make player $player's move"]
@@ -116,6 +112,10 @@ final class GameTransformer
 
     private function getResultData(Game $game): array
     {
+        if (! $game->getStatus()->is(GameStatus::COMPLETE)) {
+            return [];
+        }
+
         $p1Name = $game->getPlayer1();
         $p2Name = $game->getPlayer2();
         $p1Move = $game->getPlayer1Move()->description();
@@ -124,7 +124,7 @@ final class GameTransformer
         switch ($matchResult->toInt()) {
             case MatchResult::DRAW:
                 return [
-                    'result' => 'Draw. Both players choose ' . $p1Move,
+                    'result' => 'Draw. Both players chose ' . $p1Move,
                 ];
                 break;
 

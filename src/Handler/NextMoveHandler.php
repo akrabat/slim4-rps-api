@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace App\Handler;
 
-use App\Exception\HttpValidationException;
-use App\Model\Game;
-use App\Model\GameId;
+use App\Model\Exception\NotFoundException;
+use App\Model\GameMove;
 use App\Model\GameRepository;
 use App\Model\ValidationException;
 use App\Transformer\GameTransformer;
+use Crell\ApiProblem\ApiProblem;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
+use RKA\ContentTypeRenderer\ApiProblemRenderer;
 use RKA\ContentTypeRenderer\HalRenderer;
+use Slim\Exception\HttpBadRequestException;
+use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Response;
 
-final class CreateGameHandler implements RequestHandlerInterface
+final class NextMoveHandler implements RequestHandlerInterface
 {
     private $logger;
     private $renderer;
@@ -32,17 +35,27 @@ final class CreateGameHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $id = $request->getAttribute('id');
         $data = (array)$request->getParsedBody();
-        $this->logger->info("Creating a new game", ['data' => $data]);
+        $this->logger->info("Next move", ['id' => $id, 'data' => $data]);
 
-        $gameId = GameId::fromUuid();
         try {
-            $game = Game::newGame($gameId, $data);
-        } catch (ValidationException $e) {
-            throw HttpValidationException::fromValidationException($request, $e);
+            $game = $this->gameRepository->loadById($id);
+        } catch (NotFoundException $e) {
+            throw new HttpNotFoundException($request, $e->getMessage(), $e);
         }
 
-        $this->gameRepository->add($game);
+        try {
+            $game->makeMove($data);
+        } catch (ValidationException $e) {
+            $problem = new ApiProblem($e->getMessage(), 'https://tools.ietf.org/html/rfc7231#section-6.5.1');
+            $problem['messages'] = $e->getMessages();
+
+            $renderer = new ApiProblemRenderer(true);
+            return $renderer->render($request, new Response(400), $problem);
+        }
+
+        $this->gameRepository->update($game);
 
         $transformer = new GameTransformer();
         $hal = $transformer->transform($game);
