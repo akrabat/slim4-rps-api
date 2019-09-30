@@ -35,3 +35,8 @@ Make a move:
 
     curl -i -H "Accept: application/json" -H "Content-Type: application/json" \
       -d '{"player": "Rob", "move": "rock"}' http://localhost:8888/games/f548aae6-3f4f-4c7f-a5fc-c0c1099411f7/moves
+
+
+## Example
+
+![Screenshot of Terminal showing curl playing the RPA game ](https://raw.githubusercontent.com/akrabat/slim4-rps-api/master/doc/slim4-api-rps-example.png)
