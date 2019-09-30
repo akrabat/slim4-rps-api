@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Handler;
 
+use App\Exception\HttpValidationException;
 use App\Model\Game;
 use App\Model\GameId;
 use App\Model\GameRepository;
+use App\Model\ValidationException;
 use App\Transformer\GameTransformer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -34,7 +36,12 @@ final class CreateGameHandler implements RequestHandlerInterface
         $this->logger->info("Creating a new game", ['data' => $data]);
 
         $gameId = GameId::fromUuid();
-        $game = Game::newGame($gameId, $data);
+        try {
+            $game = Game::newGame($gameId, $data);
+        } catch (ValidationException $e) {
+            throw HttpValidationException::fromValidationException($request, $e);
+        }
+
 
         $this->gameRepository->add($game);
 

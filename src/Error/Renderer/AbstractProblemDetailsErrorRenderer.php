@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Error\Renderer;
 
+use App\Exception\HttpValidationException;
 use Crell\ApiProblem\ApiProblem;
 use Slim\Interfaces\ErrorRendererInterface;
 use Throwable;
@@ -13,6 +14,10 @@ abstract class AbstractProblemDetailsErrorRenderer implements ErrorRendererInter
     protected function createApiProblem(Throwable $exception, bool $displayErrorDetails): ApiProblem
     {
         $problem = new ApiProblem($exception->getMessage(), $this->urlForCode($exception->getCode()));
+
+        if ($exception instanceof HttpValidationException) {
+            $problem['messages'] = $exception->getMessages();
+        }
 
         if ($displayErrorDetails) {
             $problem['exception'] = [];
