@@ -10,6 +10,7 @@ use App\Model\GameRepository;
 use App\Model\ValidationException;
 use App\Transformer\GameTransformer;
 use Crell\ApiProblem\ApiProblem;
+use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -52,7 +53,7 @@ final class NextMoveHandler implements RequestHandlerInterface
             $problem['messages'] = $e->getMessages();
 
             $renderer = new ApiProblemRenderer(true);
-            return $renderer->render($request, new Response(400), $problem);
+            return $renderer->render($request, new Response(StatusCodeInterface::STATUS_BAD_REQUEST), $problem);
         }
 
         $this->gameRepository->update($game);
@@ -60,7 +61,7 @@ final class NextMoveHandler implements RequestHandlerInterface
         $transformer = new GameTransformer();
         $hal = $transformer->transform($game);
 
-        $response = new Response(201);
+        $response = new Response(StatusCodeInterface::STATUS_OK);
         $response = $this->renderer->render($request, $response, $hal);
         return $response;
     }

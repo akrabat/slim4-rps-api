@@ -6,6 +6,7 @@ namespace App\Handler;
 
 use App\Model\GameRepository;
 use App\Transformer\GameTransformer;
+use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -36,7 +37,7 @@ final class ListGamesHandler implements RequestHandlerInterface
         $transformer = new GameTransformer();
         $hal = $transformer->transformCollection($games);
 
-        $response = new Response(201);
+        $response = new Response(StatusCodeInterface::STATUS_OK);
         $response = $this->renderer->render($request, $response, $hal);
         return $response;
     }

@@ -7,6 +7,7 @@ namespace App\Handler;
 use App\Model\Exception\NotFoundException;
 use App\Model\GameRepository;
 use App\Transformer\GameTransformer;
+use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -42,7 +43,7 @@ final class GameJudgementHandler implements RequestHandlerInterface
 
         $hal = $transformer->transform($game);
 
-        $response = new Response(201);
+        $response = new Response(StatusCodeInterface::STATUS_OK);
         $response = $this->renderer->render($request, $response, $hal);
         return $response;
     }
