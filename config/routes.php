@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Handler\CreateGameHandler;
 use App\Handler\GetGameHandler;
+use App\Handler\GameJudgementHandler;
 use App\Handler\ListGamesHandler;
 use App\Handler\RootHandler;
 use Slim\App;
@@ -14,4 +15,5 @@ return static function (App $app) {
     $app->post('/games', CreateGameHandler::class);
     $app->get('/games', ListGamesHandler::class);
     $app->get('/games/{id}', GetGameHandler::class);
+    $app->get('/games/{id}/judgement', GameJudgementHandler::class);
 };

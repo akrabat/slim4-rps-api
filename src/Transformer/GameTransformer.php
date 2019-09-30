@@ -69,11 +69,10 @@ final class GameTransformer
         $state = $game->state();
         $gameId = $state['game_id'];
 
-        $self = '/games/' . $gameId;
-        $data = $$this->getResultData($game);
+        $data = $this->getResultData($game);
         $links = $this->getLinksForGame($game);
 
-        $resource = new Hal($self, $data);
+        $resource = new Hal(null, $data);
         foreach ($links as $name => $link) {
             $resource->addHalLink($name, $link);
         }
