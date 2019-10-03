@@ -32,16 +32,16 @@ final class GetGameHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $id = $request->getAttribute('id');
-        $this->logger->info("Listing games", ['id' => $id]);
+        $this->logger->info("Fetching game", ['id' => $id]);
 
         try {
-            $games = $this->gameRepository->loadById($id);
+            $game = $this->gameRepository->loadById($id);
         } catch (NotFoundException $e) {
             throw new HttpNotFoundException($request, $e->getMessage(), $e);
         }
 
         $transformer = new GameTransformer();
-        $hal = $transformer->transformItem($games);
+        $hal = $transformer->transformItem($game);
 
         $response = new Response(StatusCodeInterface::STATUS_OK);
         $response = $this->renderer->render($request, $response, $hal);
