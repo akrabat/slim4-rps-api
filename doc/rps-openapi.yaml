@@ -35,6 +35,8 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /games/{game_id}/moves:
+    parameters:
+      - $ref: '#/components/parameters/GameId'
     post:
       summary: Make a move
       description: >
@@ -42,8 +44,6 @@ paths:
       operationId: makeMove
       tags:
         - Game
-      parameters:
-        - $ref: '#/components/parameters/GameId'
       requestBody:
         description: Move to make
         required: true
@@ -77,6 +77,8 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /games/{game_id}/judgement:
+    parameters:
+      - $ref: '#/components/parameters/GameId'
     get:
       summary: Judge the game
       description: >
@@ -84,8 +86,6 @@ paths:
       operationId: judgeGame
       tags:
         - Game
-      parameters:
-        - $ref: '#/components/parameters/GameId'
       responses:
         200:
           description: >
