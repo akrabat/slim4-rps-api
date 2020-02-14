@@ -40,7 +40,7 @@ final class GetGameHandler implements RequestHandlerInterface
             throw new HttpNotFoundException($request, $e->getMessage(), $e);
         }
 
-        $transformer = new GameTransformer();
+        $transformer = new GameTransformer($request->getAttribute('base_url'));
         $hal = $transformer->transformItem($game);
 
         $response = new Response(StatusCodeInterface::STATUS_OK);

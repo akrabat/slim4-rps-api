@@ -58,7 +58,7 @@ final class NextMoveHandler implements RequestHandlerInterface
 
         $this->gameRepository->update($game);
 
-        $transformer = new GameTransformer();
+        $transformer = new GameTransformer($request->getAttribute('base_url'));
         $hal = $transformer->transform($game);
 
         $response = new Response(StatusCodeInterface::STATUS_OK);

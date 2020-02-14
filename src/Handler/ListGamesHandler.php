@@ -34,7 +34,7 @@ final class ListGamesHandler implements RequestHandlerInterface
 
         $games = $this->gameRepository->fetch();
 
-        $transformer = new GameTransformer();
+        $transformer = new GameTransformer($request->getAttribute('base_url'));
         $hal = $transformer->transformCollection($games);
 
         $response = new Response(StatusCodeInterface::STATUS_OK);

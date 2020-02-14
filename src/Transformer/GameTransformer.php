@@ -14,12 +14,19 @@ use Nocarrier\HalLink;
 
 final class GameTransformer
 {
+    protected $rootUrl;
+
+    public function __construct(string $rootUrl = '')
+    {
+        $this->rootUrl = rtrim($rootUrl, '/');
+    }
+    
     /**
      * Create a payload for a single Game
      */
     public function transformItem(Game $game): Hal
     {
-        $self = '/games/' . $game->getGameId()->toString();
+        $self = $this->rootUrl . '/games/' . $game->getGameId()->toString();
         $data = [
             'player1' => $game->getPlayer1(),
             'player2' => $game->getPlayer2(),
@@ -46,7 +53,7 @@ final class GameTransformer
      */
     public function transformCollection(array $games): Hal
     {
-        $hal = new Hal('/games');
+        $hal = new Hal($this->rootUrl . '/games');
 
         $count = 0;
         foreach ($games as $game) {
@@ -66,10 +73,6 @@ final class GameTransformer
      */
     public function transform(Game $game): Hal
     {
-        /** @var Game $game */
-        $state = $game->state();
-        $gameId = $state['game_id'];
-
         $data = $this->getResultData($game);
         $links = $this->getLinksForGame($game);
 
@@ -87,7 +90,7 @@ final class GameTransformer
         switch ($game->getStatus()->toString()) {
             case GameStatus::CREATED:
                 $links['makeNextMove'] = new HalLink(
-                    '/games/' . $gameId . '/moves',
+                    $this->rootUrl . '/games/' . $gameId . '/moves',
                     ['description' => "Make a player's move"]
                 );
                 break;
@@ -98,13 +101,16 @@ final class GameTransformer
                     $player = '2';
                 }
                 $links['makeNextMove'] = new HalLink(
-                    '/games/' . $gameId . '/moves',
+                    $this->rootUrl . '/games/' . $gameId . '/moves',
                     ['description' => "Make player $player's move"]
                 );
                 break;
 
             case GameStatus::COMPLETE:
-                $links['newGame'] = new HalLink('/games/', ['description' => 'Start a new game']);
+                $links['newGame'] = new HalLink(
+                    $this->rootUrl . '/games/',
+                    ['description' => 'Start a new game']
+                );
         }
 
         return $links;

@@ -39,7 +39,7 @@ final class GameJudgementHandler implements RequestHandlerInterface
         } catch (NotFoundException $e) {
             throw new HttpNotFoundException($request, $e->getMessage(), $e);
         }
-        $transformer = new GameTransformer();
+        $transformer = new GameTransformer($request->getAttribute('base_url'));
 
         $hal = $transformer->transform($game);
 

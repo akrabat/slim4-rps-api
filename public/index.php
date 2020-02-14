@@ -13,7 +13,7 @@ $settings = (require __DIR__ . '/../config/settings.php')(APP_ENV);
 
 // Set up dependencies
 $containerBuilder = new ContainerBuilder();
-if($settings['di_compilation_path']) {
+if ($settings['di_compilation_path']) {
     $containerBuilder->enableCompilation($settings['di_compilation_path']);
 }
 (require __DIR__ . '/../config/dependencies.php')($containerBuilder, $settings);
