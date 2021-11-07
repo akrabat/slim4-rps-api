@@ -27,11 +27,11 @@ paths:
             schema:
               $ref: '#/components/schemas/NewGameRequest'
       responses:
-        201:
+        "201":
           $ref: '#/components/responses/NewGameResponse'
-        400:
+        "400":
           $ref: '#/components/responses/NewGameError'
-        500:
+        "500":
           $ref: '#/components/responses/InternalServerError'
 
   /games/{game_id}/moves:
@@ -53,7 +53,7 @@ paths:
               $ref: '#/components/schemas/MakeMoveRequest'
             example: {"player":"Rob Allen", "move":"rock"}
       responses:
-        200:
+        "200":
           description: >
               Move accepted.
 
@@ -67,13 +67,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MakeMoveResponse'
-        400:
+        "400":
           description: "Unable to play that move"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MakeMoveError'
-        500:
+        "500":
           $ref: '#/components/responses/InternalServerError'
 
   /games/{game_id}/judgement:
@@ -87,7 +87,7 @@ paths:
       tags:
         - Game
       responses:
-        200:
+        "200":
           description: >
               The result the game.
           content:
@@ -117,13 +117,13 @@ paths:
                             type: string
                             description: "Information about this link"
                             example: "Start a new game"
-        400:
+        "400":
           description: "Unable to judge game"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JudgementError'
-        500:
+        "500":
           $ref: '#/components/responses/InternalServerError'
 
 
