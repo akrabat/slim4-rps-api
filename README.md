@@ -40,3 +40,16 @@ Make a move:
 ## Example
 
 ![Screenshot of Terminal showing curl playing the RPA game ](https://raw.githubusercontent.com/akrabat/slim4-rps-api/master/doc/slim4-api-rps-example.png)
+
+
+## Validating the OpenAPI Spec
+
+1. Install Spectral:
+   
+        npm install -g @stoplight/spectral-cli
+
+2. Validate:
+
+        cd doc
+        spectral lint rps-openapi.yaml
+
