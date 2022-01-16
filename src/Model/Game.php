@@ -7,43 +7,34 @@ namespace App\Model;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use DateTimeImmutable;
+use DateTimeZone;
+use Exception;
 use RuntimeException;
 
 final class Game implements Entity
 {
-    /** @var GameId */
-    private $gameId;
-
-    /** @var string */
-    private $player1;
-
-    /** @var string */
-    private $player2;
-
-    /** @var GameMove */
-    private $player1Move;
-
-    /** @var GameMove */
-    private $player2Move;
-
-    /** @var GameStatus */
-    private $status;
-
-    /** @var DateTimeImmutable */
-    private $created;
+    private GameId $gameId;
+    private string $player1;
+    private string $player2;
+    private GameMove $player1Move;
+    private GameMove $player2Move;
+    private GameStatus $status;
+    private DateTimeImmutable $created;
 
     /**
-     * @throws \Assert\AssertionFailedException
-     * @throws \Exception
+     * @throws Exception
      */
     private function __construct()
     {
-        $this->created = new DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->created = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         $this->player1Move = new GameMove(GameMove::NOT_PLAYED);
         $this->player2Move = new GameMove(GameMove::NOT_PLAYED);
         $this->status = new GameStatus(GameStatus::CREATED);
     }
 
+    /**
+     * @param string[] $data
+     */
     public static function newGame(GameId $gameId, array $data): Game
     {
         self::validateNewGameData($data);
@@ -121,8 +112,11 @@ final class Game implements Entity
 
     /**
      * Make a move
+     *
+     * @param string[] $data
+     * @throws ValidationException
      */
-    public function makeMove(array $data)
+    public function makeMove(array $data): void
     {
         $this->validateMakeMoveData($data);
 
@@ -152,6 +146,8 @@ final class Game implements Entity
 
     /**
      * Return an array representing the state of this entity. The keys match the database columns.
+     *
+     * @return string[]
      */
     public function state(): array
     {
@@ -168,7 +164,10 @@ final class Game implements Entity
 
     /**
      * Create a Game from a database row
-     * @throws \Assert\AssertionFailedException
+     *
+     * @param string[] $state
+     * @throws AssertionFailedException
+     * @throws Exception
      */
     public static function fromState(array $state): Game
     {
@@ -194,6 +193,8 @@ final class Game implements Entity
 
     /**
      * Validate data from user to create a new game
+     *
+     * @param string[] $data
      */
     private static function validateNewGameData(array $data): void
     {
@@ -212,6 +213,8 @@ final class Game implements Entity
 
     /**
      * Validate data from user to make a move
+     *
+     * @param string[] $data
      */
     private function validateMakeMoveData(array $data): void
     {

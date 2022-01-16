@@ -16,15 +16,11 @@ use Slim\Psr7\Response;
 
 final class ListGamesHandler implements RequestHandlerInterface
 {
-    private $logger;
-    private $renderer;
-    private $gameRepository;
-
-    public function __construct(LoggerInterface $logger, GameRepository $gameRepository, HalRenderer $renderer)
-    {
-        $this->logger = $logger;
-        $this->renderer = $renderer;
-        $this->gameRepository = $gameRepository;
+    public function __construct(
+        private LoggerInterface $logger,
+        private GameRepository $gameRepository,
+        private HalRenderer $renderer
+    ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -34,7 +30,9 @@ final class ListGamesHandler implements RequestHandlerInterface
 
         $games = $this->gameRepository->fetch();
 
-        $transformer = new GameTransformer($request->getAttribute('base_url'));
+        /** @var string $baseUrl */
+        $baseUrl = $request->getAttribute('base_url');
+        $transformer = new GameTransformer($baseUrl);
         $hal = $transformer->transformCollection($games);
 
         $response = new Response(StatusCodeInterface::STATUS_OK);

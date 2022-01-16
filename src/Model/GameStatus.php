@@ -12,13 +12,14 @@ final class GameStatus
     public const IN_PROGRESS = 'IN_PROGRESS';
     public const COMPLETE    = 'COMPLETE';
 
-    public static $validStatuses = ['CREATED', 'IN_PROGRESS', 'COMPLETE'];
-    private $status;
+    /**
+     * @var string[]
+     */
+    public static array $validStatuses = ['CREATED', 'IN_PROGRESS', 'COMPLETE'];
 
-    public function __construct(string $status)
+    public function __construct(private string $status)
     {
         Assertion::choice($status, self::$validStatuses);
-        $this->status = $status;
     }
 
     public function toString(): string

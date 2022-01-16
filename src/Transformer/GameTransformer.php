@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Transformer;
 
-use App\Model\Entity;
 use App\Model\Game;
 use App\Model\GameMove;
 use App\Model\GameStatus;
@@ -14,13 +13,11 @@ use Nocarrier\HalLink;
 
 final class GameTransformer
 {
-    protected $rootUrl;
-
-    public function __construct(string $rootUrl = '')
+    public function __construct(protected string $rootUrl = '')
     {
         $this->rootUrl = rtrim($rootUrl, '/');
     }
-    
+
     /**
      * Create a payload for a single Game
      */
@@ -83,7 +80,10 @@ final class GameTransformer
         return $resource;
     }
 
-    private function getLinksForGame(Game $game)
+    /**
+     * @return array<string, HalLink>
+     */
+    private function getLinksForGame(Game $game): array
     {
         $links = [];
         $gameId = $game->getGameId()->toString();
@@ -116,6 +116,9 @@ final class GameTransformer
         return $links;
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function getResultData(Game $game): array
     {
         if (! $game->getStatus()->is(GameStatus::COMPLETE)) {
@@ -132,21 +135,19 @@ final class GameTransformer
                 return [
                     'result' => 'Draw. Both players chose ' . $p1Move,
                 ];
-                break;
 
             case MatchResult::P1_WIN:
                 return [
                     'result' => $p1Name . ' wins. ' . $p1Move . ' beats ' . $p2Move . '.',
                     'winner' => $p1Name,
                 ];
-                break;
 
             case MatchResult::P2_WIN:
                 return [
                     'result' => $p2Name . ' wins. ' . $p2Move . ' beats ' . $p1Move . '.',
                     'winner' => $p2Name,
                 ];
-                break;
         }
+        throw new \RuntimeException("Unknown MatchResult");
     }
 }

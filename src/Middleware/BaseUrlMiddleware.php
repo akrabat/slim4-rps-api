@@ -14,7 +14,7 @@ class BaseUrlMiddleware implements MiddlewareInterface
     public function process(
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
-    ) : ResponseInterface {
+    ): ResponseInterface {
 
         $uri = $request->getUri();
         $scheme = $uri->getScheme();

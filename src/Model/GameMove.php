@@ -14,18 +14,27 @@ final class GameMove
     public const PAPER = 'PAPER';
     public const SCISSORS = 'SCISSORS';
 
-    public static $validMoves = ['NOT_PLAYED', 'ROCK', 'PAPER', 'SCISSORS'];
-    public static $validNextMoves = ['ROCK', 'PAPER', 'SCISSORS'];
-    private $move;
+    /**
+     * @var string[]
+     */
+    public static array $validMoves = ['NOT_PLAYED', 'ROCK', 'PAPER', 'SCISSORS'];
 
     /**
-     * @throws AssertionFailedException
+     * @var string[]
      */
-    public function __construct(string $move)
+    public static array $validNextMoves = ['ROCK', 'PAPER', 'SCISSORS'];
+
+    /**
+     * @throws ValidationException
+     */
+    public function __construct(private string $move)
     {
         $move = strtoupper($move);
-        Assertion::choice($move, self::$validMoves);
-        $this->move = $move;
+        try {
+            Assertion::choice($move, self::$validMoves);
+        } catch (AssertionFailedException $e) {
+            throw new ValidationException("$move is invalid", $e->getCode(), $e);
+        }
     }
 
     public function toString(): string

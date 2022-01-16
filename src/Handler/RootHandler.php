@@ -5,23 +5,22 @@ declare(strict_types=1);
 namespace App\Handler;
 
 use Fig\Http\Message\StatusCodeInterface;
+use JsonException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Psr7\Response;
 
-use function Safe\json_encode;
-
 class RootHandler implements RequestHandlerInterface
 {
-    private $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
+    /**
+     * @throws JsonException
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $this->logger->info('Root handler dispatched');
@@ -35,7 +34,7 @@ class RootHandler implements RequestHandlerInterface
                     'games' => '/games'
                     ],
                 ],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
             )
         );
         return $response;

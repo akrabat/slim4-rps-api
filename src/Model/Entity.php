@@ -14,6 +14,8 @@ interface Entity
      *         'order_id' => 21,
      *         'order_date' => '2018-10-03'
      *     ];
+     *
+     * @return string[]
      */
     public function state(): array;
 }

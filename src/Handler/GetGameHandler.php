@@ -18,19 +18,16 @@ use Slim\Psr7\Response;
 
 final class GetGameHandler implements RequestHandlerInterface
 {
-    private $logger;
-    private $renderer;
-    private $gameRepository;
-
-    public function __construct(LoggerInterface $logger, GameRepository $gameRepository, HalRenderer $renderer)
-    {
-        $this->logger = $logger;
-        $this->renderer = $renderer;
-        $this->gameRepository = $gameRepository;
+    public function __construct(
+        private LoggerInterface $logger,
+        private GameRepository $gameRepository,
+        private HalRenderer $renderer
+    ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        /** @var string $id */
         $id = $request->getAttribute('id');
         $this->logger->info("Fetching game", ['id' => $id]);
 
@@ -40,7 +37,9 @@ final class GetGameHandler implements RequestHandlerInterface
             throw new HttpNotFoundException($request, $e->getMessage(), $e);
         }
 
-        $transformer = new GameTransformer($request->getAttribute('base_url'));
+        /** @var string $baseUrl */
+        $baseUrl = $request->getAttribute('base_url');
+        $transformer = new GameTransformer($baseUrl);
         $hal = $transformer->transformItem($game);
 
         $response = new Response(StatusCodeInterface::STATUS_OK);

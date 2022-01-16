@@ -10,7 +10,10 @@ use Slim\Exception\HttpBadRequestException;
 
 final class HttpValidationException extends HttpBadRequestException
 {
-    private $messages;
+    /**
+     * @var string[] array
+     */
+    private array $messages;
 
     public static function fromvalidationexception(
         ServerRequestInterface $request,
@@ -21,6 +24,9 @@ final class HttpValidationException extends HttpBadRequestException
         return $e;
     }
 
+    /**
+     * @return string[]
+     */
     public function getMessages(): array
     {
         return $this->messages;

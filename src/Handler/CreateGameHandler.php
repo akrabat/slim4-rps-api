@@ -20,15 +20,11 @@ use Slim\Psr7\Response;
 
 final class CreateGameHandler implements RequestHandlerInterface
 {
-    private $logger;
-    private $renderer;
-    private $gameRepository;
-
-    public function __construct(LoggerInterface $logger, GameRepository $gameRepository, HalRenderer $renderer)
-    {
-        $this->logger = $logger;
-        $this->renderer = $renderer;
-        $this->gameRepository = $gameRepository;
+    public function __construct(
+        private LoggerInterface $logger,
+        private GameRepository $gameRepository,
+        private HalRenderer $renderer
+    ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface

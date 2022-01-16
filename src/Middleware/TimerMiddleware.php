@@ -19,6 +19,6 @@ class TimerMiddleware implements MiddlewareInterface
 
         $taken = microtime(true) - $start;
 
-        return $response->withHeader('Time-Taken', $taken);
+        return $response->withHeader('Time-Taken', (string)$taken);
     }
 }

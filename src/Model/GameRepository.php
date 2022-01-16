@@ -5,38 +5,35 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Model\Exception\NotFoundException;
+use Assert\AssertionFailedException;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 
 final class GameRepository
 {
-    private $tableName = 'games';
+    private const TABLE_NAME = 'games';
 
-    /** @var Connection  */
-    private $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     /**
      * @throws DBALException
      */
-    public function add(Game $game)
+    public function add(Game $game): void
     {
         $data = $game->state();
-        $this->connection->insert($this->tableName, $data);
+        $this->connection->insert(self::TABLE_NAME, $data);
     }
 
     /**
      * @throws DBALException
      */
-    public function update(Game $game)
+    public function update(Game $game): void
     {
         $data = $game->state();
         $this->connection->update(
-            $this->tableName,
+            self::TABLE_NAME,
             $data,
             [
                 'game_id' => $data['game_id']
@@ -46,25 +43,33 @@ final class GameRepository
 
     /**
      * @return Game[]
+     * @throws AssertionFailedException
+     * @throws DBALException
      */
     public function fetch(): array
     {
-        $sql = 'SELECT * from ' . $this->tableName . ' ORDER BY created';
-        $rows = $this->connection->fetchAll($sql);
+        $sql = 'SELECT * from ' . self::TABLE_NAME . ' ORDER BY created';
+        /** @var array<int,array<string, string>> $rows */
+        $rows = $this->connection->fetchAllAssociative($sql);
 
-        $results = array_map(function ($row) {
+        $results = array_map(static function ($row) {
             return Game::fromState($row);
         }, $rows);
 
         return $results;
     }
 
-    public function loadById($id): Game
+    /**
+     * @throws DBALException
+     * @throws AssertionFailedException
+     */
+    public function loadById(string $id): Game
     {
         $gameId = GameId::fromString($id);
 
-        $sql = 'SELECT * from ' . $this->tableName . ' WHERE game_id = :id';
-        $row = $this->connection->fetchAssoc($sql, ['id' => $gameId->toString()]);
+        $sql = 'SELECT * from ' . self::TABLE_NAME . ' WHERE game_id = :id';
+        /** @var false|array<string, string> $row */
+        $row = $this->connection->fetchAssociative($sql, ['id' => $gameId->toString()]);
 
         if ($row === false) {
             throw new NotFoundException("Game not found");

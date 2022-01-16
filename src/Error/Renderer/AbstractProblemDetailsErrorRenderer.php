@@ -20,16 +20,17 @@ abstract class AbstractProblemDetailsErrorRenderer implements ErrorRendererInter
         }
 
         if ($displayErrorDetails) {
-            $problem['exception'] = [];
+            $formattedExceptions = [];
             do {
-                $problem['exception'][] = $this->formatExceptionFragment($exception);
+                $formattedExceptions[] = $this->formatExceptionFragment($exception);
             } while ($exception = $exception->getPrevious());
+            $problem['exception'] = $formattedExceptions;
         }
 
         return $problem;
     }
 
-    protected function urlForCode($code)
+    protected function urlForCode(int $code): string
     {
         $urls = [
             100 => 'https://tools.ietf.org/html/rfc7231#section-6.2.1',
@@ -75,13 +76,12 @@ abstract class AbstractProblemDetailsErrorRenderer implements ErrorRendererInter
             505 => 'https://tools.ietf.org/html/rfc7231#section-6.6.6',
         ];
 
-        if (isset($urls[$code])) {
-            return $urls[$code];
-        }
-
-        return 'https://tools.ietf.org/html/rfc7231';
+        return $urls[$code] ?? 'https://tools.ietf.org/html/rfc7231';
     }
 
+    /**
+     * @phpstan-return array<string, int|string>
+     */
     protected function formatExceptionFragment(Throwable $exception): array
     {
         return [

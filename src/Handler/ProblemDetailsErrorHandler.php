@@ -8,6 +8,7 @@ use App\Error\Renderer\JsonProblemDetailsErrorRenderer;
 use App\Error\Renderer\XmlProblemDetailsErrorRenderer;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 use Slim\Exception\HttpMethodNotAllowedException;
 use Slim\Handlers\ErrorHandler as SlimErrorHandler;
 use Slim\Interfaces\CallableResolverInterface;
@@ -46,7 +47,10 @@ final class ProblemDetailsErrorHandler extends SlimErrorHandler
         }
 
         $renderer = $this->determineRenderer();
-        $body = call_user_func($renderer, $this->exception, $this->displayErrorDetails);
+        $body = $renderer($this->exception, $this->displayErrorDetails);
+        if (!is_string($body)) {
+            throw new RuntimeException("Failed to render body");
+        }
         $response->getBody()->write($body);
 
         return $response;

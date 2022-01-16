@@ -23,19 +23,16 @@ use Slim\Psr7\Response;
 
 final class NextMoveHandler implements RequestHandlerInterface
 {
-    private $logger;
-    private $renderer;
-    private $gameRepository;
-
-    public function __construct(LoggerInterface $logger, GameRepository $gameRepository, HalRenderer $renderer)
-    {
-        $this->logger = $logger;
-        $this->renderer = $renderer;
-        $this->gameRepository = $gameRepository;
+    public function __construct(
+        private LoggerInterface $logger,
+        private GameRepository $gameRepository,
+        private HalRenderer $renderer
+    ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        /** @var string $id */
         $id = $request->getAttribute('id');
         $data = (array)$request->getParsedBody();
         $this->logger->info("Next move", ['id' => $id, 'data' => $data]);
@@ -58,7 +55,9 @@ final class NextMoveHandler implements RequestHandlerInterface
 
         $this->gameRepository->update($game);
 
-        $transformer = new GameTransformer($request->getAttribute('base_url'));
+        /** @var string $baseUrl */
+        $baseUrl = $request->getAttribute('base_url');
+        $transformer = new GameTransformer($baseUrl);
         $hal = $transformer->transform($game);
 
         $response = new Response(StatusCodeInterface::STATUS_OK);
