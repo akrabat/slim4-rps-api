@@ -16,7 +16,11 @@
     ],
     "config": {
         "optimize-autoloader": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "ocramius/package-versions": true,
+            "composer/package-versions-deprecated": true
+        }
     },
     "autoload": {
         "psr-4": {
@@ -29,26 +33,25 @@
         }
     },
     "require": {
-        "akrabat/rka-content-type-renderer": "^1.0",
-        "beberlei/assert": "^3.2",
-        "crell/api-problem": "^3.2",
-        "doctrine/dbal": "^2.9",
-        "monolog/monolog": "^2.0",
-        "nocarrier/hal": "^0.9.12",
-        "php-di/php-di": "^6.0",
-        "ramsey/uuid": "^3.8",
-        "slim/psr7": "^1.0.0",
-        "slim/slim": "^4.2",
-        "thecodingmachine/safe": "^0.1.16"
+        "php": "^8.0",
+        "akrabat/rka-content-type-renderer": "^2.0",
+        "beberlei/assert": "^3.3",
+        "crell/api-problem": "^3.6",
+        "doctrine/dbal": "^2.13",
+        "monolog/monolog": "^2.3",
+        "nocarrier/hal": "^0.9.14",
+        "php-di/php-di": "^6.3",
+        "ramsey/uuid": "^4.2",
+        "slim/psr7": "^1.5",
+        "slim/slim": "^4.9"
     }
     ,
     "require-dev": {
         "doctrine/migrations": "^2.1",
-        "phpstan/phpstan": "^0.11.16",
-        "phpunit/phpunit": "^8.3",
+        "phpstan/phpstan": "^1.4",
+        "phpunit/phpunit": "^9.5",
         "roave/security-advisories": "dev-master",
-        "squizlabs/php_codesniffer": "^3.5",
-        "thecodingmachine/phpstan-safe-rule": "^0.1.4"
+        "squizlabs/php_codesniffer": "^3.6"
     },
     "scripts": {
         "check": "phpcs && phpunit && phpstan analyse",
