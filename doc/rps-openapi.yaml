@@ -5,8 +5,8 @@ info:
   version: "1.0.0"
   description: >
     An implementation of Rock-Paper-Scissors
-  # contact:
-  #   name: "Rob Allen"
+  contact:
+    name: "Rob Allen"
 
 servers:
   - url: https://rock-paper-scissors.example.com
@@ -22,6 +22,10 @@ paths:
       responses:
         "200":
           $ref: '#/components/responses/ListGamesResponse'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "405":
+          $ref: '#/components/responses/MethodNotAllowedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
     post:
@@ -42,6 +46,10 @@ paths:
           $ref: '#/components/responses/NewGameResponse'
         "400":
           $ref: '#/components/responses/NewGameError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "405":
+          $ref: '#/components/responses/MethodNotAllowedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -81,9 +89,13 @@ paths:
         "400":
           description: "Unable to play that move"
           content:
-            application/json:
+            application/problem+json:
               schema:
                 $ref: '#/components/schemas/MakeMoveError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "405":
+          $ref: '#/components/responses/MethodNotAllowedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -131,9 +143,13 @@ paths:
         "400":
           description: "Unable to judge game"
           content:
-            application/json:
+            application/problem+json:
               schema:
                 $ref: '#/components/schemas/JudgementError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "405":
+          $ref: '#/components/responses/MethodNotAllowedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -262,6 +278,36 @@ components:
             description: "Reason why a judgement cannot be made"
             example: "Both players need to have made a move"
   responses:
+    NotFoundError:
+      description: "A Not Found error occurred"
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: "Information about error"
+                example: "Game not found"
+              type:
+                type: string
+                description: "Link to IETF information about this error"
+                example: "https://tools.ietf.org/html/rfc7231#section-6.5.4"
+    MethodNotAllowedError:
+      description: "A Method Not Allowed error occurred"
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: "Information about error"
+                example: "Method not found"
+              type:
+                type: string
+                description: "Link to IETF information about this error"
+                example: "https://tools.ietf.org/html/rfc7231#section-6.5.5"
     InternalServerError:
       description: "An internal server error occurred"
       content:
@@ -273,6 +319,18 @@ components:
                   type: string
                   description: "Information about error"
                   example: "Internal Server Error"
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: "Information about error"
+                example: "Game not found"
+              type:
+                type: string
+                description: "Link to IETF information about this error"
+                example: "https://tools.ietf.org/html/rfc7231#section-6.5.4"
     ListGamesResponse:
       description: "The list of games"
       content:
@@ -307,7 +365,7 @@ components:
 
           The link required to play the game by making the first move is provided in the `_links` property of the returned payload.
       content:
-        application/json:
+        application/hal+json:
           schema:
             type: object
             properties:
@@ -330,7 +388,7 @@ components:
     NewGameError:
       description: "Unable to create game due to a problem with the provided information"
       content:
-        application/json:
+        application/problem+json:
           schema:
             type: object
             properties:
