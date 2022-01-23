@@ -29,7 +29,7 @@ class OpenApiValidationMiddleware implements MiddlewareInterface
         // validate request
         try {
             $match = $this->requestValidator->validate($request);
-        } catch (ValidationFailed $e) {
+        } catch (\Throwable $e) {
             throw new HttpBadRequestException($request, $e->getMessage(), $e);
         }
 
