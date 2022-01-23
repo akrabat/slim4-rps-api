@@ -20,4 +20,13 @@ return static function (App $app) {
         $app->getCallableResolver(),
         $app->getResponseFactory()
     ));
+    $app->add(new class implements \Psr\Http\Server\MiddlewareInterface {
+        public function process(
+            \Psr\Http\Message\ServerRequestInterface $request,
+            \Psr\Http\Server\RequestHandlerInterface $handler
+        ): \Psr\Http\Message\ResponseInterface {
+            $request = $request->withHeader('Accept', 'application/json');
+            return $handler->handle($request);
+        }
+    });
 };
