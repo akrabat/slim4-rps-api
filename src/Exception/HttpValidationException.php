@@ -13,9 +13,9 @@ final class HttpValidationException extends HttpBadRequestException
     /**
      * @var string[] array
      */
-    private array $messages;
+    private array $messages = [];
 
-    public static function fromvalidationexception(
+    public static function fromValidationException(
         ServerRequestInterface $request,
         ValidationException $exception
     ): HttpBadRequestException {

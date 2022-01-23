@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Middleware\OpenApiValidationMiddleware;
 use DI\ContainerBuilder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use League\OpenAPIValidation\PSR7\ValidatorBuilder;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
 
 return static function (ContainerBuilder $containerBuilder, array $settings) {
@@ -16,6 +19,7 @@ return static function (ContainerBuilder $containerBuilder, array $settings) {
         'settings' => $settings,
 
         LoggerInterface::class => static function (ContainerInterface $c) {
+            /** @var array $settings */
             $settings = $c->get('settings')['logger'];
 
             $logger = new Logger($settings['name']);
@@ -29,15 +33,33 @@ return static function (ContainerBuilder $containerBuilder, array $settings) {
             return $logger;
         },
 
-        Connection::class  => static function (ContainerInterface $c) {
+        Connection::class => static function (ContainerInterface $c) {
+            /** @var array{'driver': string} $params */
             $params = $c->get('settings')['db'];
 
             $connection = DriverManager::getConnection($params);
-            if (strpos($params['driver'], 'sqlite') === 0) {
-                $connection->exec('PRAGMA foreign_keys = ON');
+            if (str_starts_with($params['driver'], 'sqlite')) {
+                $connection->executeStatement('PRAGMA foreign_keys = ON');
             }
 
             return $connection;
         },
+
+        OpenApiValidationMiddleware::class => static function (ContainerInterface $c) {
+            $builder = new class extends ValidatorBuilder
+            {
+                public function getValidationMiddleware(): MiddlewareInterface
+                {
+                    return new OpenApiValidationMiddleware(
+                        $this->getServerRequestValidator(),
+                        $this->getResponseValidator()
+                    );
+                }
+            };
+            $builder->fromYamlFile(__DIR__ . '/../doc/rps-openapi.yaml');
+            $builder->setCache(...)->overrideCacheKey('openapi');
+            $mw = $builder->getValidationMiddleware();
+            return $mw;
+        }
     ]);
 };

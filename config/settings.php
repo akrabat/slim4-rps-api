@@ -26,7 +26,7 @@ return static function (string $appEnv) {
     if ($appEnv === 'DEVELOPMENT') {
         // Overrides for development mode
         $settings['di_compilation_path'] = '';
-        $settings['display_error_details'] = true;
+        $settings['display_error_details'] = false;
 
         // To store logs to a separate file, uncomment this line
         // $settings['logger']['path'] = __DIR__ . '/../var/log/app.log';

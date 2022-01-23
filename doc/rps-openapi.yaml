@@ -5,14 +5,25 @@ info:
   version: "1.0.0"
   description: >
     An implementation of Rock-Paper-Scissors
-  contact:
-    name: "Rob Allen"
+  # contact:
+  #   name: "Rob Allen"
 
 servers:
   - url: https://rock-paper-scissors.example.com
 
 paths:
   /games:
+    get:
+      summary: List all games
+      description: Create a new game of Rock-Paper-Scissors
+      operationId: listGames
+      tags:
+        - Game
+      responses:
+        "200":
+          $ref: '#/components/responses/ListGamesResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     post:
       summary: Create a new game
       description: Create a new game of Rock-Paper-Scissors
@@ -136,6 +147,7 @@ components:
       description: "Game Id"
       schema:
         $ref: '#/components/schemas/GameId'
+
   schemas:
     GameId:
       type: string
@@ -144,12 +156,19 @@ components:
     Player:
       type: string
       example: "Rob Allen"
+    Status:
+      type: string
+      "enum":
+        - Game not started
+        - Game in progress
+        - Game complete
     Move:
       type: string
       enum:
         - rock
         - paper
         - scissors
+
     NewGameRequest:
       example: {"player1":"Rob Allen", "player2":"Matthieu Napoli"}
       properties:
@@ -172,9 +191,27 @@ components:
     MakeMoveResponse:
       description: Either a link to make a next move or a link to get the results is provided.
       oneOf:
-        - $ref: '#/components/schemas/NextMove'
-        - $ref: '#/components/schemas/Judgement'
-    NextMove:
+      - $ref: '#/components/schemas/NextMoveLink'
+      - $ref: '#/components/schemas/JudgementLink'
+
+    # NewGameLink:
+    #   type: object
+    #   properties:
+    #       _links:
+    #         type: object
+    #         properties:
+    #           newGame:
+    #             type: object
+    #             properties:
+    #               href:
+    #                 type: string
+    #                 description: "URL to create a new game"
+    #                 example: /games
+    #               description:
+    #                 type: string
+    #                 description: "Information about this link"
+    #                 example: "Start a new game"
+    NextMoveLink:
       type: object
       properties:
           _links:
@@ -191,7 +228,7 @@ components:
                     type: string
                     description: "Information about this link"
                     example: "Make other player's move"
-    Judgement:
+    JudgementLink:
       type: object
       properties:
           _links:
@@ -236,6 +273,33 @@ components:
                   type: string
                   description: "Information about error"
                   example: "Internal Server Error"
+    ListGamesResponse:
+      description: "The list of games"
+      content:
+        application/hal+json:
+          schema:
+            type: object
+            properties:
+              count:
+                type: integer
+              _links:
+                type: object
+              _embedded:
+                type: object
+                properties:
+                  game:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        player1:
+                          $ref: '#/components/schemas/Player'
+                        player2:
+                          $ref: '#/components/schemas/Player'
+                        status:
+                          $ref: '#/components/schemas/Status'
+
+
     NewGameResponse:
       description: >
           The game was successfully created.

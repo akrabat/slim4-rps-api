@@ -6,6 +6,8 @@ use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Slim\Handlers\Strategies\RequestHandler;
 
+error_reporting(E_ALL & -E_USER_DEPRECATED);
+
 require __DIR__ . '/../vendor/autoload.php';
 
 define('APP_ENV', $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'DEVELOPMENT');
