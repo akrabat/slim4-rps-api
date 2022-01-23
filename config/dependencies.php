@@ -57,7 +57,7 @@ return static function (ContainerBuilder $containerBuilder, array $settings) {
                 }
             };
             $builder->fromYamlFile(__DIR__ . '/../doc/rps-openapi.yaml');
-            $builder->setCache(...)->overrideCacheKey('openapi');
+            //$builder->setCache(...)->overrideCacheKey('openapi');
             $mw = $builder->getValidationMiddleware();
             return $mw;
         }
