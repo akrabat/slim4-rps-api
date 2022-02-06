@@ -3,10 +3,11 @@ openapi: "3.0.3"
 info:
   title: Rock-Paper-Scissors
   version: "1.0.0"
-  description: >
-    An implementation of Rock-Paper-Scissors
+  description: An implementation of Rock-Paper-Scissors
   contact:
     name: "Rob Allen"
+  license:
+    name: The MIT License
 
 servers:
   - url: https://rock-paper-scissors.example.com
@@ -153,7 +154,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
 components:
   parameters:
     GameId:
@@ -186,7 +186,7 @@ components:
         - scissors
 
     NewGameRequest:
-      example: {"player1":"Rob Allen", "player2":"Matthieu Napoli"}
+      example: {"player1":"Lucy", "player2":"Dave"}
       properties:
         player1:
           $ref: '#/components/schemas/Player'
