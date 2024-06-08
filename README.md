@@ -13,7 +13,7 @@ See [Open API Specification](https://akrabat.com/stuff/rps.html).
 2. Run the migrations:
 
         $ touch db/rps.db
-        $ vendor/bin/doctrine-migrations migrations:migrate
+        $ vendor/bin/doctrine-migrations migrations:migrate -n
 
 3. Run the API
 
