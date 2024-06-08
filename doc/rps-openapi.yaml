@@ -1,17 +1,14 @@
-openapi: "3.0.3"
-
+openapi: 3.0.3
 info:
   title: Rock-Paper-Scissors
-  version: "1.0.0"
+  version: 1.0.0
   description: An implementation of Rock-Paper-Scissors
   contact:
-    name: "Rob Allen"
+    name: Rob Allen
   license:
     name: The MIT License
-
 servers:
-  - url: https://rock-paper-scissors.example.com
-
+  - url: 'https://rock-paper-scissors.example.com'
 paths:
   /games:
     get:
@@ -21,13 +18,13 @@ paths:
       tags:
         - Game
       responses:
-        "200":
+        '200':
           $ref: '#/components/responses/ListGamesResponse'
-        "404":
+        '404':
           $ref: '#/components/responses/NotFoundError'
-        "405":
+        '405':
           $ref: '#/components/responses/MethodNotAllowedError'
-        "500":
+        '500':
           $ref: '#/components/responses/InternalServerError'
     post:
       summary: Create a new game
@@ -43,23 +40,22 @@ paths:
             schema:
               $ref: '#/components/schemas/NewGameRequest'
       responses:
-        "201":
+        '201':
           $ref: '#/components/responses/NewGameResponse'
-        "400":
+        '400':
           $ref: '#/components/responses/NewGameError'
-        "404":
+        '404':
           $ref: '#/components/responses/NotFoundError'
-        "405":
+        '405':
           $ref: '#/components/responses/MethodNotAllowedError'
-        "500":
+        '500':
           $ref: '#/components/responses/InternalServerError'
-
-  /games/{game_id}/moves:
+  '/games/{game_id}/moves':
     parameters:
       - $ref: '#/components/parameters/GameId'
     post:
       summary: Make a move
-      description: >
+      description: |
         This needs to happen twice: once for each player. Once both moves are played, the game is over.
       operationId: makeMove
       tags:
@@ -71,49 +67,46 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MakeMoveRequest'
-            example: {"player":"Rob Allen", "move":"rock"}
+            example:
+              player: Rob Allen
+              move: rock
       responses:
-        "200":
-          description: >
-              Move accepted.
+        '200':
+          description: |
+            Move accepted.
 
-
-              On a successful move, either the other player's move will be required in which case another
-              call the Make Move is required or if this is the second player's move, then you may call
-              the Judge endpoint to find out who won.
-
-              The next call to make is provided in the `_links` property of the returned payload.
+            On a successful move, either the other player's move will be required in which case another call the Make Move is required or if this is the second player's move, then you may call the Judge endpoint to find out who won.
+            The next call to make is provided in the `_links` property of the returned payload.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MakeMoveResponse'
-        "400":
-          description: "Unable to play that move"
+        '400':
+          description: Unable to play that move
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/MakeMoveError'
-        "404":
+        '404':
           $ref: '#/components/responses/NotFoundError'
-        "405":
+        '405':
           $ref: '#/components/responses/MethodNotAllowedError'
-        "500":
+        '500':
           $ref: '#/components/responses/InternalServerError'
-
-  /games/{game_id}/judgement:
+  '/games/{game_id}/judgement':
     parameters:
       - $ref: '#/components/parameters/GameId'
     get:
       summary: Judge the game
-      description: >
+      description: |
         Who won the game?
       operationId: judgeGame
       tags:
         - Game
       responses:
-        "200":
-          description: >
-              The result the game.
+        '200':
+          description: |
+            The result the game.
           content:
             application/json:
               schema:
@@ -121,12 +114,12 @@ paths:
                 properties:
                   result:
                     type: string
-                    description: "The result of the result"
-                    example: "Rob Allen won: rock beats scissors"
+                    description: The result of the result
+                    example: 'Rob Allen won: rock beats scissors'
                   winner:
                     type: string
-                    description: "The player that one. Empty if a draw."
-                    example: "Rob Allen"
+                    description: The player that one. Empty if a draw.
+                    example: Rob Allen
                   _links:
                     type: object
                     properties:
@@ -135,46 +128,44 @@ paths:
                         properties:
                           href:
                             type: string
-                            description: "URL to start a new game"
+                            description: URL to start a new game
                             example: /games
                           description:
                             type: string
-                            description: "Information about this link"
-                            example: "Start a new game"
-        "400":
-          description: "Unable to judge game"
+                            description: Information about this link
+                            example: Start a new game
+        '400':
+          description: Unable to judge game
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/JudgementError'
-        "404":
+        '404':
           $ref: '#/components/responses/NotFoundError'
-        "405":
+        '405':
           $ref: '#/components/responses/MethodNotAllowedError'
-        "500":
+        '500':
           $ref: '#/components/responses/InternalServerError'
-
 components:
   parameters:
     GameId:
       name: game_id
       in: path
       required: true
-      description: "Game Id"
+      description: Game Id
       schema:
         $ref: '#/components/schemas/GameId'
-
   schemas:
     GameId:
       type: string
-      example: "2BC08389-885A-4322-80D0-EF0DE2D7CD37"
-      format: "uuid"
+      example: 2BC08389-885A-4322-80D0-EF0DE2D7CD37
+      format: uuid
     Player:
       type: string
-      example: "Rob Allen"
+      example: Rob Allen
     Status:
       type: string
-      "enum":
+      enum:
         - Game not started
         - Game in progress
         - Game complete
@@ -184,9 +175,10 @@ components:
         - rock
         - paper
         - scissors
-
     NewGameRequest:
-      example: {"player1":"Lucy", "player2":"Dave"}
+      example:
+        player1: Lucy
+        player2: Dave
       properties:
         player1:
           $ref: '#/components/schemas/Player'
@@ -207,79 +199,61 @@ components:
     MakeMoveResponse:
       description: Either a link to make a next move or a link to get the results is provided.
       oneOf:
-      - $ref: '#/components/schemas/NextMoveLink'
-      - $ref: '#/components/schemas/JudgementLink'
-
-    # NewGameLink:
-    #   type: object
-    #   properties:
-    #       _links:
-    #         type: object
-    #         properties:
-    #           newGame:
-    #             type: object
-    #             properties:
-    #               href:
-    #                 type: string
-    #                 description: "URL to create a new game"
-    #                 example: /games
-    #               description:
-    #                 type: string
-    #                 description: "Information about this link"
-    #                 example: "Start a new game"
+        - $ref: '#/components/schemas/NextMoveLink'
+        - $ref: '#/components/schemas/JudgementLink'
     NextMoveLink:
       type: object
       properties:
-          _links:
-            type: object
-            properties:
-              makeNextMove:
-                type: object
-                properties:
-                  href:
-                    type: string
-                    description: "URL for player move"
-                    example: /games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/moves
-                  description:
-                    type: string
-                    description: "Information about this link"
-                    example: "Make other player's move"
+        _links:
+          type: object
+          properties:
+            makeNextMove:
+              type: object
+              properties:
+                href:
+                  type: string
+                  description: URL for player move
+                  example: /games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/moves
+                description:
+                  type: string
+                  description: Information about this link
+                  example: Make other player's move
     JudgementLink:
       type: object
       properties:
-          _links:
-            type: object
-            properties:
-              judgeGame:
-                type: object
-                properties:
-                  href:
-                    type: string
-                    description: "URL to judge the game"
-                    example: /games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/judgement
-                  description:
-                    type: string
-                    description: "Information about this link"
-                    example: "Judge the game"
+        _links:
+          type: object
+          properties:
+            judgeGame:
+              type: object
+              properties:
+                href:
+                  type: string
+                  description: URL to judge the game
+                  example: /games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/judgement
+                description:
+                  type: string
+                  description: Information about this link
+                  example: Judge the game
     MakeMoveError:
       type: object
       properties:
-          player:
-            type: string
-            description: "Player is invalid"
-          move:
-            type: string
-            description: "Move is invalid"
+        player:
+          type: string
+          description: Player is invalid
+        move:
+          type: string
+          description: Move is invalid
     JudgementError:
       type: object
       properties:
-          message:
-            type: string
-            description: "Reason why a judgement cannot be made"
-            example: "Both players need to have made a move"
+        message:
+          type: string
+          description: Reason why a judgement cannot be made
+          example: Both players need to have made a move
   responses:
     NotFoundError:
-      description: "A Not Found error occurred"
+      description: A Not Found error occurred
       content:
         application/problem+json:
           schema:
@@ -287,14 +261,14 @@ components:
             properties:
               title:
                 type: string
-                description: "Information about error"
-                example: "Game not found"
+                description: Information about error
+                example: Game not found
               type:
                 type: string
-                description: "Link to IETF information about this error"
-                example: "https://tools.ietf.org/html/rfc7231#section-6.5.4"
+                description: Link to IETF information about this error
+                example: 'https://tools.ietf.org/html/rfc7231#section-6.5.4'
     MethodNotAllowedError:
-      description: "A Method Not Allowed error occurred"
+      description: A Method Not Allowed error occurred
       content:
         application/problem+json:
           schema:
@@ -302,37 +276,37 @@ components:
             properties:
               title:
                 type: string
-                description: "Information about error"
-                example: "Method not found"
+                description: Information about error
+                example: Method not found
               type:
                 type: string
-                description: "Link to IETF information about this error"
-                example: "https://tools.ietf.org/html/rfc7231#section-6.5.5"
+                description: Link to IETF information about this error
+                example: 'https://tools.ietf.org/html/rfc7231#section-6.5.5'
     InternalServerError:
-      description: "An internal server error occurred"
+      description: An internal server error occurred
       content:
         application/json:
           schema:
             type: object
             properties:
-                message:
-                  type: string
-                  description: "Information about error"
-                  example: "Internal Server Error"
+              message:
+                type: string
+                description: Information about error
+                example: Internal Server Error
         application/problem+json:
           schema:
             type: object
             properties:
               title:
                 type: string
-                description: "Information about error"
-                example: "Game not found"
+                description: Information about error
+                example: Game not found
               type:
                 type: string
-                description: "Link to IETF information about this error"
-                example: "https://tools.ietf.org/html/rfc7231#section-6.5.4"
+                description: Link to IETF information about this error
+                example: 'https://tools.ietf.org/html/rfc7231#section-6.5.4'
     ListGamesResponse:
-      description: "The list of games"
+      description: The list of games
       content:
         application/hal+json:
           schema:
@@ -356,14 +330,11 @@ components:
                           $ref: '#/components/schemas/Player'
                         status:
                           $ref: '#/components/schemas/Status'
-
-
     NewGameResponse:
-      description: >
-          The game was successfully created.
+      description: |
+        The game was successfully created.
 
-
-          The link required to play the game by making the first move is provided in the `_links` property of the returned payload.
+        The link required to play the game by making the first move is provided in the `_links` property of the returned payload.
       content:
         application/hal+json:
           schema:
@@ -379,25 +350,20 @@ components:
                     properties:
                       href:
                         type: string
-                        description: "URL for player move"
+                        description: URL for player move
                         example: /games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/moves
                       description:
                         type: string
-                        description: "Information about this link"
-                        example: "Make a player's move"
+                        description: Information about this link
+                        example: Make a player's move
     NewGameError:
-      description: "Unable to create game due to a problem with the provided information"
+      description: Unable to create game due to a problem with the provided information
       content:
         application/problem+json:
           schema:
             type: object
             properties:
-                message:
-                  type: string
-                  description: "Information on why the new game cannot be created"
-                  example: "Must provide both player1 and player2"
-
-tags:
-  - name: Game
-    description: >
-      All the operations you need to play a game of Rock-Paper-Scissors
+              message:
+                type: string
+                description: Information on why the new game cannot be created
+                example: Must provide both player1 and player2
