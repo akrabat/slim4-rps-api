@@ -37,22 +37,22 @@
         "akrabat/rka-content-type-renderer": "^2.0",
         "beberlei/assert": "^3.3",
         "crell/api-problem": "^3.6",
-        "doctrine/dbal": "^2.13",
-        "league/openapi-psr7-validator": "^0.16.4",
-        "monolog/monolog": "^2.3",
+        "doctrine/dbal": "^4.0",
+        "league/openapi-psr7-validator": "^0.22",
+        "monolog/monolog": "^3.6",
         "nocarrier/hal": "^0.9.14",
-        "php-di/php-di": "^6.3",
-        "ramsey/uuid": "^4.2",
-        "slim/psr7": "^1.5",
-        "slim/slim": "^4.9"
+        "php-di/php-di": "^7.0",
+        "ramsey/uuid": "^4.7",
+        "slim/psr7": "^1.7",
+        "slim/slim": "^4.13"
     }
     ,
     "require-dev": {
-        "doctrine/migrations": "^2.1",
-        "phpstan/phpstan": "^1.4",
-        "phpunit/phpunit": "^9.5",
+        "doctrine/migrations": "^3.7",
+        "phpstan/phpstan": "^1.11",
+        "phpunit/phpunit": "^11.2",
         "roave/security-advisories": "dev-master",
-        "squizlabs/php_codesniffer": "^3.6"
+        "squizlabs/php_codesniffer": "^3.10"
     },
     "scripts": {
         "check": "phpcs && phpunit && phpstan analyse",
