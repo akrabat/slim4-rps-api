@@ -51,19 +51,27 @@ Make a move:
 
 ## Validating the OpenAPI Spec
 
-If you have Docker installed:
+You need npm installed.
 
-   make validate-spec 
-
-
-If you have npm installed locally:
-
-1. Install Spectral:
+1. Install Spectral & Redocly CLI:
    
         npm install -g @stoplight/spectral-cli
+        npm install -g @redocly/cli
 
 2. Validate:
 
-        cd doc
-        spectral lint rps-openapi.yaml
+        make check
 
+
+## Build docs
+
+To create a static HTML file, `doc/rps.html`
+
+   make docs-build
+
+
+To serve the doc so that it refreshes automatically when the spec file is edited:
+
+   make docs-preview
+
+and then view at http://127.0.0.1:8080

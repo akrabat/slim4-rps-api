@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Rock-Paper-Scissors
   version: 1.0.0
@@ -7,6 +7,7 @@ info:
     name: Rob Allen
   license:
     name: The MIT License
+    identifier: MIT
 servers:
   - url: 'https://localhost:8888'
 paths:
@@ -64,7 +65,6 @@ paths:
       summary: View a single game
       description: Retrieve a game of Rock-Paper-Scissors
       operationId: getGame
-
       responses:
         '200':
           $ref: '#/components/responses/GameResponse'
@@ -116,58 +116,6 @@ paths:
           $ref: '#/components/responses/MethodNotAllowedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  '/games/{game_id}/judgement':
-    parameters:
-      - $ref: '#/components/parameters/GameId'
-    get:
-      summary: Judge the game
-      description: |
-        Who won the game?
-      operationId: judgeGame
-
-      responses:
-        '200':
-          description: |
-            The result the game.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: string
-                    description: The result of the result
-                    example: 'Rob Allen won: rock beats scissors'
-                  winner:
-                    type: string
-                    description: The player that one. Empty if a draw.
-                    example: Rob Allen
-                  _links:
-                    type: object
-                    properties:
-                      newGame:
-                        type: object
-                        properties:
-                          href:
-                            type: string
-                            description: URL to start a new game
-                            example: /games
-                          description:
-                            type: string
-                            description: Information about this link
-                            example: Start a new game
-        '400':
-          description: Unable to judge game
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/JudgementError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '405':
-          $ref: '#/components/responses/MethodNotAllowedError'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
 components:
   parameters:
     GameId:
@@ -184,7 +132,10 @@ components:
       format: uuid
     Player:
       type: string
-      example: Rob Allen
+      example: Rob
+    Player2:
+      type: string
+      example: Sadie
     Status:
       type: string
       enum:
@@ -205,10 +156,28 @@ components:
         properties:
           href:
             type: string
-            example: http://example.com/games
+            example: http://rps.example/games
           description:
             type: string
             example: Start a new game
+    GamesLink:
+        type: object
+        properties:
+          href:
+            type: string
+            example: http://rps.example/games/
+          description:
+            type: string
+            example: All games
+    GameLink:
+        type: object
+        properties:
+          href:
+            type: string
+            example: http://rps.example/games/2BC08389-885A-4322-80D0-EF0DE2D7CD37
+          description:
+            type: string
+            example: This game
     NewGameRequest:
       example:
         player1: Lucy
@@ -241,13 +210,15 @@ components:
         _links:
           type: object
           properties:
+            self:
+              $ref: '#/components/schemas/GameLink'
             makeNextMove:
               type: object
               properties:
                 href:
                   type: string
                   description: URL for player move
-                  example: http://example.com/games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/moves
+                  example: http://rps.example/games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/moves
                 description:
                   type: string
                   description: Information about this link
@@ -256,10 +227,12 @@ components:
       type: object
       properties:
         result:
-          type: string
+          $ref: '#/components/schemas/Result'
         _links:
           type: object
           properties:
+            self:
+              $ref: '#/components/schemas/GameLink'
             newGame:
               $ref: '#/components/schemas/NewGameLink'
     MakeMoveError:
@@ -271,13 +244,6 @@ components:
         move:
           type: string
           description: Move is invalid
-    JudgementError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Reason why a judgement cannot be made
-          example: Both players need to have made a move
   responses:
     NotFoundError:
       description: A Not Found error occurred
@@ -341,6 +307,9 @@ components:
             properties:
               _links:
                 type: object
+                properties:
+                  games:
+                    $ref: '#/components/schemas/GamesLink'
     ListGamesResponse:
       description: The list of games
       content:
@@ -352,6 +321,9 @@ components:
                 type: integer
               _links:
                 type: object
+                properties:
+                  self:
+                    $ref: '#/components/schemas/GamesLink'
               _embedded:
                 type: object
                 properties:
@@ -363,9 +335,15 @@ components:
                         player1:
                           $ref: '#/components/schemas/Player'
                         player2:
-                          $ref: '#/components/schemas/Player'
+                          $ref: '#/components/schemas/Player2'
                         status:
                           $ref: '#/components/schemas/Status'
+                        _links:
+                          type: object
+                          properties:
+                            self:
+                              $ref: '#/components/schemas/GameLink'
+
     GameResponse:
       description: A single game
       content:
@@ -376,7 +354,7 @@ components:
               player1:
                 $ref: '#/components/schemas/Player'
               player2:
-                $ref: '#/components/schemas/Player'
+                $ref: '#/components/schemas/Player2'
               status:
                 $ref: '#/components/schemas/Status'
               result:
@@ -386,6 +364,8 @@ components:
               _links:
                 type: object
                 properties:
+                  self:
+                    $ref: '#/components/schemas/GameLink'
                   newGame:
                     $ref: '#/components/schemas/NewGameLink'
     NewGameResponse:
@@ -398,11 +378,11 @@ components:
           schema:
             type: object
             properties:
-              game_id:
-                $ref: '#/components/schemas/GameId'
               _links:
                 type: object
                 properties:
+                  self:
+                    $ref: '#/components/schemas/GameLink'
                   makeNextMove:
                     type: object
                     properties:
