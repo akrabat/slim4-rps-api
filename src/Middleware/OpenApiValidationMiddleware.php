@@ -5,6 +5,7 @@ namespace App\Middleware;
 use League\OpenAPIValidation\PSR7\Exception\ValidationFailed;
 use League\OpenAPIValidation\PSR7\ResponseValidator;
 use League\OpenAPIValidation\PSR7\ServerRequestValidator;
+use League\OpenAPIValidation\Schema\Exception\TooManyValidSchemas;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -40,6 +41,12 @@ class OpenApiValidationMiddleware implements MiddlewareInterface
         try {
             $this->responseValidator->validate($match, $response);
         } catch (ValidationFailed $e) {
+            $previous = $e->getPrevious();
+            if ($previous && $previous instanceof TooManyValidSchemas) {
+                // Response validation allows for missing properties, so NextMoveBody & JudgementBody look the same
+                // which causes a TooManyValidSchemas even though one has a `result` property and one doesn't
+                return $response;
+            }
             throw new HttpInternalServerErrorException($request, $e->getMessage(), $e);
         }
 

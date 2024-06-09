@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Monolog\Logger;
+use Monolog\Level;
 
 return static function (string $appEnv) {
     $settings =  [
@@ -14,7 +14,7 @@ return static function (string $appEnv) {
         'logger' => [
             'name' => 'slim-app',
             'path' => 'php://stderr',
-            'level' => Logger::DEBUG,
+            'level' => Level::Debug,
         ],
 
         'db' => [

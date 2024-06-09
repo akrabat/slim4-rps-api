@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Handler;
 
 use App\Exception\HttpValidationException;
+use App\Middleware\BaseUrlMiddleware;
 use App\Model\Game;
 use App\Model\GameId;
 use App\Model\GameRepository;
 use App\Model\ValidationException;
 use App\Transformer\GameTransformer;
+use Assert\AssertionFailedException;
+use Doctrine\DBAL\Exception;
 use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,6 +30,10 @@ final class CreateGameHandler implements RequestHandlerInterface
     ) {
     }
 
+    /**
+     * @throws AssertionFailedException
+     * @throws Exception
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $data = (array)$request->getParsedBody();
@@ -41,7 +48,7 @@ final class CreateGameHandler implements RequestHandlerInterface
 
         $this->gameRepository->add($game);
 
-        $transformer = new GameTransformer();
+        $transformer = new GameTransformer(BaseUrlMiddleware::getBaseUrl($request));
         $hal = $transformer->transform($game);
 
         $response = new Response(StatusCodeInterface::STATUS_CREATED);

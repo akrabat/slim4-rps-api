@@ -25,15 +25,17 @@ class RootHandler implements RequestHandlerInterface
     {
         $this->logger->info('Root handler dispatched');
 
+        $links = [
+            'links' => [
+                'games' => '/games'
+            ],
+        ];
+
         $response = new Response(StatusCodeInterface::STATUS_OK);
-        $response = $response->withHeader('Content-Type', 'application/json');
+        $response = $response->withHeader('Content-Type', 'application/hal+json');
         $response->getBody()->write(
             json_encode(
-                [
-                'links' => [
-                    'games' => '/games'
-                    ],
-                ],
+                $links,
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
             )
         );

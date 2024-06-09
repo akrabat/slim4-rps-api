@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Handler;
 
+use App\Middleware\BaseUrlMiddleware;
 use App\Model\Exception\NotFoundException;
 use App\Model\GameRepository;
 use App\Transformer\GameTransformer;
@@ -37,9 +38,7 @@ final class GetGameHandler implements RequestHandlerInterface
             throw new HttpNotFoundException($request, $e->getMessage(), $e);
         }
 
-        /** @var string $baseUrl */
-        $baseUrl = $request->getAttribute('base_url');
-        $transformer = new GameTransformer($baseUrl);
+        $transformer = new GameTransformer(BaseUrlMiddleware::getBaseUrl($request));
         $hal = $transformer->transformItem($game);
 
         $response = new Response(StatusCodeInterface::STATUS_OK);

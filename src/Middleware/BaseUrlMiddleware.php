@@ -26,4 +26,11 @@ class BaseUrlMiddleware implements MiddlewareInterface
         $request = $request->withAttribute('base_url', $rootUrl);
         return $handler->handle($request);
     }
+
+    public static function getBaseUrl(ServerRequestInterface $request): string
+    {
+        $baseUrl = $request->getAttribute('base_url');
+        assert(is_string($baseUrl));
+        return $baseUrl;
+    }
 }

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Handler;
 
+use App\Error\ErrorCodes;
+use App\Middleware\BaseUrlMiddleware;
 use App\Model\Exception\NotFoundException;
-use App\Model\GameMove;
 use App\Model\GameRepository;
 use App\Model\ValidationException;
 use App\Transformer\GameTransformer;
+use Assert\AssertionFailedException;
 use Crell\ApiProblem\ApiProblem;
+use Doctrine\DBAL\Exception;
 use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,7 +20,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use RKA\ContentTypeRenderer\ApiProblemRenderer;
 use RKA\ContentTypeRenderer\HalRenderer;
-use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Response;
 
@@ -30,6 +32,10 @@ final class NextMoveHandler implements RequestHandlerInterface
     ) {
     }
 
+    /**
+     * @throws AssertionFailedException
+     * @throws Exception
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         /** @var string $id */
@@ -46,7 +52,7 @@ final class NextMoveHandler implements RequestHandlerInterface
         try {
             $game->makeMove($data);
         } catch (ValidationException $e) {
-            $problem = new ApiProblem($e->getMessage(), 'https://tools.ietf.org/html/rfc7231#section-6.5.1');
+            $problem = new ApiProblem($e->getMessage(), ErrorCodes::urlForCode(400));
             $problem['messages'] = $e->getMessages();
 
             $renderer = new ApiProblemRenderer(true);
@@ -55,9 +61,7 @@ final class NextMoveHandler implements RequestHandlerInterface
 
         $this->gameRepository->update($game);
 
-        /** @var string $baseUrl */
-        $baseUrl = $request->getAttribute('base_url');
-        $transformer = new GameTransformer($baseUrl);
+        $transformer = new GameTransformer(BaseUrlMiddleware::getBaseUrl($request));
         $hal = $transformer->transform($game);
 
         $response = new Response(StatusCodeInterface::STATUS_OK);

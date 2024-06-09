@@ -29,11 +29,11 @@ final class GameMove
      */
     public function __construct(private string $move)
     {
-        $move = strtoupper($move);
+        $this->move = strtoupper($move);
         try {
-            Assertion::choice($move, self::$validMoves);
+            Assertion::choice($this->move, self::$validMoves);
         } catch (AssertionFailedException $e) {
-            throw new ValidationException("$move is invalid", $e->getCode(), $e);
+            throw new ValidationException("$this->move is invalid", $e->getCode(), $e);
         }
     }
 
@@ -44,6 +44,6 @@ final class GameMove
 
     public function description(): string
     {
-        return strtolower(str_replace('_', ' ', $this->move));
+        return ucwords(strtolower(str_replace('_', ' ', $this->move)));
     }
 }

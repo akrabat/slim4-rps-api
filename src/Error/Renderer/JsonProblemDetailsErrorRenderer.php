@@ -10,7 +10,6 @@ final class JsonProblemDetailsErrorRenderer extends AbstractProblemDetailsErrorR
 {
     public function __invoke(Throwable $exception, bool $displayErrorDetails): string
     {
-        $problem = $this->createApiProblem($exception, $displayErrorDetails);
-        return $problem->asJson(true);
+        return $this->createApiProblem($exception, $displayErrorDetails)->asJson(true);
     }
 }

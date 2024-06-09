@@ -8,17 +8,24 @@ See [Open API Specification](https://akrabat.com/stuff/rps.html).
 
 1. Run composer
 
-        $ composer install
+       $ composer install
 
 2. Run the migrations:
 
-        $ touch db/rps.db
-        $ vendor/bin/doctrine-migrations migrations:migrate -n
+       $ touch db/rps.db
+       $ vendor/bin/doctrine-migrations migrations:migrate -n
 
 3. Run the API
 
-        $ php -d html_errors=0 -S 0.0.0.0:8888 -t public/
+       $ php -d html_errors=0 -S 0.0.0.0:8888 -t public/
 
+4. Test that it works using
+
+       $ bin/play-game.sh
+
+5. Reset the database
+
+       $ composer reset-database
 
 ## Useful curl commands
 

@@ -57,8 +57,9 @@
     "scripts": {
         "check": "phpcs && phpunit && phpstan analyse",
         "generate-migration": "vendor/bin/doctrine-migrations migrations:generate",
-        "migrate": "vendor/bin/doctrine-migrations migrations:migrate",
+        "migrate": "vendor/bin/doctrine-migrations migrations:migrate -n",
         "migrations": "vendor/bin/doctrine-migrations",
-        "seed": "vendor/bin/doctrine-migrations seed:rcopmon"
+        "seed": "vendor/bin/doctrine-migrations seed:rcopmon",
+        "reset-database": "rm -f db/rps.db && touch db/rps.db && vendor/bin/doctrine-migrations migrations:migrate -n"
     }
 }

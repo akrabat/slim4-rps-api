@@ -10,6 +10,15 @@ info:
 servers:
   - url: 'https://rock-paper-scissors.example.com'
 paths:
+  /:
+    get:
+      summary: Root
+      description: Entry point to the API, Lists endpoints of interest.
+      tags:
+        - Game
+      responses:
+        200:
+          $ref: '#/components/responses/RootResponse'
   /games:
     get:
       summary: List all games
@@ -50,6 +59,22 @@ paths:
           $ref: '#/components/responses/MethodNotAllowedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /games/{game_id}:
+    get:
+      summary: View a single game
+      description: Retrieve a game of Rock-Paper-Scissors
+      operationId: getGame
+      tags:
+        - Game
+      responses:
+        '200':
+          $ref: '#/components/responses/GameResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   '/games/{game_id}/moves':
     parameters:
       - $ref: '#/components/parameters/GameId'
@@ -78,7 +103,7 @@ paths:
             On a successful move, either the other player's move will be required in which case another call the Make Move is required or if this is the second player's move, then you may call the Judge endpoint to find out who won.
             The next call to make is provided in the `_links` property of the returned payload.
           content:
-            application/json:
+            application/hal+json:
               schema:
                 $ref: '#/components/schemas/MakeMoveResponse'
         '400':
@@ -169,12 +194,24 @@ components:
         - Game not started
         - Game in progress
         - Game complete
+    Result:
+      type: string
+      example: "Rob wins. Rock beats Scissors."
     Move:
       type: string
       enum:
         - rock
         - paper
         - scissors
+    NewGameLink:
+        type: object
+        properties:
+          href:
+            type: string
+            example: http://example.com/games
+          description:
+            type: string
+            example: Start a new game
     NewGameRequest:
       example:
         player1: Lucy
@@ -199,9 +236,9 @@ components:
     MakeMoveResponse:
       description: Either a link to make a next move or a link to get the results is provided.
       oneOf:
-        - $ref: '#/components/schemas/NextMoveLink'
-        - $ref: '#/components/schemas/JudgementLink'
-    NextMoveLink:
+        - $ref: '#/components/schemas/NextMoveBody'
+        - $ref: '#/components/schemas/ResultBody'
+    NextMoveBody:
       type: object
       properties:
         _links:
@@ -213,28 +250,21 @@ components:
                 href:
                   type: string
                   description: URL for player move
-                  example: /games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/moves
+                  example: http://example.com/games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/moves
                 description:
                   type: string
                   description: Information about this link
                   example: Make other player's move
-    JudgementLink:
+    ResultBody:
       type: object
       properties:
+        result:
+          type: string
         _links:
           type: object
           properties:
-            judgeGame:
-              type: object
-              properties:
-                href:
-                  type: string
-                  description: URL to judge the game
-                  example: /games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/judgement
-                description:
-                  type: string
-                  description: Information about this link
-                  example: Judge the game
+            newGame:
+              $ref: '#/components/schemas/NewGameLink'
     MakeMoveError:
       type: object
       properties:
@@ -305,6 +335,15 @@ components:
                 type: string
                 description: Link to IETF information about this error
                 example: 'https://tools.ietf.org/html/rfc7231#section-6.5.4'
+    RootResponse:
+      description: The list of interesting endpoints
+      content:
+        application/hal+json:
+          schema:
+            type: object
+            properties:
+              _links:
+                type: object
     ListGamesResponse:
       description: The list of games
       content:
@@ -330,6 +369,28 @@ components:
                           $ref: '#/components/schemas/Player'
                         status:
                           $ref: '#/components/schemas/Status'
+    GameResponse:
+      description: A single game
+      content:
+        application/hal+json:
+          schema:
+            type: object
+            properties:
+              player1:
+                $ref: '#/components/schemas/Player'
+              player2:
+                $ref: '#/components/schemas/Player'
+              status:
+                $ref: '#/components/schemas/Status'
+              result:
+                $ref: '#/components/schemas/Result'
+              winner:
+                $ref: '#/components/schemas/Player'
+              _links:
+                type: object
+                properties:
+                  newGame:
+                    $ref: '#/components/schemas/NewGameLink'
     NewGameResponse:
       description: |
         The game was successfully created.

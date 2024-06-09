@@ -5,34 +5,36 @@ declare(strict_types=1);
 namespace AppTest\Handler;
 
 use App\Handler\RootHandler;
-use PHPUnit\Framework\MockObject\MockObject;
+use JsonException;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerInterface;
 
 class RootHandlerTest extends TestCase
 {
-    /** @var LoggerInterface|MockObject */
-    protected $logger;
+    protected TestHandler $logHandler;
+    protected Logger $logger;
 
     protected function setUp(): void
     {
-        $this->logger = $this->createMock(LoggerInterface::class);
-        $this->logger
-            ->expects($this->once())
-            ->method('info')
-            ->with('Root handler dispatched');
+        $this->logHandler = new TestHandler();
+        $this->logger = new Logger('test', [$this->logHandler]);
     }
 
-    public function testReturnsLinks()
+    /**
+     * @throws Exception
+     * @throws JsonException
+     */
+    public function testReturnsLinks(): void
     {
         $request = $this->createMock(ServerRequestInterface::class);
 
         $rootHandler = new RootHandler($this->logger);
         $response = $rootHandler->handle($request);
 
-        $result = json_decode((string)$response->getBody(), true);
+        $result = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame(['links' => ['games' => '/games']], $result);
     }
 }

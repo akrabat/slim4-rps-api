@@ -6,6 +6,8 @@ namespace App\Handler;
 
 use App\Model\GameRepository;
 use App\Transformer\GameTransformer;
+use Assert\AssertionFailedException;
+use Doctrine\DBAL\Exception;
 use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,6 +25,10 @@ final class ListGamesHandler implements RequestHandlerInterface
     ) {
     }
 
+    /**
+     * @throws AssertionFailedException
+     * @throws Exception
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $params = $request->getQueryParams();
