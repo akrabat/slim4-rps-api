@@ -8,24 +8,23 @@ info:
   license:
     name: The MIT License
 servers:
-  - url: 'https://rock-paper-scissors.example.com'
+  - url: 'https://localhost:8888'
 paths:
   /:
     get:
       summary: Root
       description: Entry point to the API, Lists endpoints of interest.
-      tags:
-        - Game
+      operationId: root
+
       responses:
-        200:
+        '200':
           $ref: '#/components/responses/RootResponse'
   /games:
     get:
       summary: List all games
       description: Create a new game of Rock-Paper-Scissors
       operationId: listGames
-      tags:
-        - Game
+
       responses:
         '200':
           $ref: '#/components/responses/ListGamesResponse'
@@ -39,8 +38,7 @@ paths:
       summary: Create a new game
       description: Create a new game of Rock-Paper-Scissors
       operationId: createGame
-      tags:
-        - Game
+
       requestBody:
         description: Game to add
         required: true
@@ -60,12 +58,13 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
   /games/{game_id}:
+    parameters:
+      - $ref: '#/components/parameters/GameId'
     get:
       summary: View a single game
       description: Retrieve a game of Rock-Paper-Scissors
       operationId: getGame
-      tags:
-        - Game
+
       responses:
         '200':
           $ref: '#/components/responses/GameResponse'
@@ -83,8 +82,7 @@ paths:
       description: |
         This needs to happen twice: once for each player. Once both moves are played, the game is over.
       operationId: makeMove
-      tags:
-        - Game
+
       requestBody:
         description: Move to make
         required: true
@@ -126,8 +124,7 @@ paths:
       description: |
         Who won the game?
       operationId: judgeGame
-      tags:
-        - Game
+
       responses:
         '200':
           description: |

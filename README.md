@@ -51,6 +51,13 @@ Make a move:
 
 ## Validating the OpenAPI Spec
 
+If you have Docker installed:
+
+   make validate-spec 
+
+
+If you have npm installed locally:
+
 1. Install Spectral:
    
         npm install -g @stoplight/spectral-cli

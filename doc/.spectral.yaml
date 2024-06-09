@@ -1,1 +1,17 @@
-extends: spectral:oas
+extends: ["spectral:oas"]
+rules:
+  # Servers are not require in this spec
+  oas3-api-servers: false
+  # Tags are not required
+  operation-tags: false
+  # Require 3-part Semantic Versions as the spec versions
+  # (from https://lornajane.net/posts/2020/custom-openapi-style-rules-with-spectral)
+  semver:
+    severity: error
+    recommended: true
+    message: Specs should follow semantic versioning (x.y.z). {{value}} is not a valid version.
+    given: $.info.version
+    then:
+      function: pattern
+      functionOptions:
+        match: "^([0-9]+.[0-9]+.[0-9]+)$"
