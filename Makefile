@@ -16,8 +16,10 @@ lint-redocly: ## Validate the OpenAPI specification
 	@echo "Linting with redocly/cli"
 	@redocly lint --config doc/redocly.yaml ${OPTS} doc/openapi.yaml
 
-doc-build: ## Build the docs
-	@bin/build-docs.sh
+docs-build: ## Build the docs
+	@echo "Building docs with redocly/cli"
+	@redocly build-docs -o doc/rps.html doc/openapi.yaml
 
-doc-preview: ## Preview the docs
-	@bin/preview-docs.sh
+docs-preview: ## Preview the docs
+	@echo "Preview docs with redocly/cli"
+	@redocly preview-docs doc/openapi.yaml
