@@ -9,7 +9,7 @@ info:
     name: The MIT License
     identifier: MIT
 servers:
-  - url: 'https://localhost:8888'
+  - url: 'http://rps.example'
 paths:
   /:
     get:
@@ -389,7 +389,7 @@ components:
                       href:
                         type: string
                         description: URL for player move
-                        example: /games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/moves
+                        example: http://rps.example/games/2BC08389-885A-4322-80D0-EF0DE2D7CD37/moves
                       description:
                         type: string
                         description: Information about this link
