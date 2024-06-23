@@ -31,16 +31,16 @@ See [Open API Specification](https://akrabat.com/stuff/rps.html).
 
 Create a game:
 
-    curl -i -H "Accept: application/json" -H "Content-Type: application/json" \
+    curl -s -i -H "Accept: application/hal+json" -H "Content-Type: application/json" \
       http://localhost:8888/games -d '{"player1": "Rob", "player2": "Jon"}'
 
 List games:
 
-    curl -i -H "Accept: application/json" http://localhost:8888/games
+    curl -s -i -H "Accept: application/hal+json" http://localhost:8888/games
 
 Make a move:
 
-    curl -i -H "Accept: application/json" -H "Content-Type: application/json" \
+    curl -s -i -H "Accept: application/hal+json" -H "Content-Type: application/json" \
       -d '{"player": "Rob", "move": "rock"}' http://localhost:8888/games/f548aae6-3f4f-4c7f-a5fc-c0c1099411f7/moves
 
 
@@ -75,3 +75,15 @@ To serve the doc so that it refreshes automatically when the spec file is edited
    make docs-preview
 
 and then view at http://127.0.0.1:8080
+
+
+## Mocking
+
+To mock the server, install Prism:
+
+   npm install -g @stoplight/prism-cli
+   
+Run:
+
+   prism mock doc/openapi.yaml 
+
