@@ -39,30 +39,35 @@ curlwithcode() {
 # create game
 echo "1. Create game between $player1 and $player2"
 echo "   POST to /games, with data: "'{"player1": "'"$player1"'", "player2": "'"$player2"'"}'
-curlwithcode -H "Accept: application/json" -H "Content-Type: application/json" "$url/games" -d '{"player1": "'"$player1"'", "player2": "'"$player2"'"}'
+echo "       curl -s -H 'Accept: application/hal+json' -H 'Content-Type: application/json' '$url/games' -d '{\"player1\": \"$player1\", \"player2\": \"$player2\"}'"
+curlwithcode -H "Accept: application/hal+json" -H "Content-Type: application/json" "$url/games" -d '{"player1": "'"$player1"'", "player2": "'"$player2"'"}'
 echo "   Response: $status_code:"
 echo "$body" | pr -to 6
 
 # extract next move url from JSON body
 move1_url=$(echo "$body" | jq -r '._links.makeNextMove.href')
+move1_url="${move1_url/http:\/\/rps.example/$url}"
 
 # Make player 1's move
 echo ""
 echo "2. Make $player1's move: $move1"
 echo "   POST to /games/{game_id}, with data: "'{"player": "'"$player1"'", "move": "'"$move1"'"}'
-curlwithcode -H "Accept: application/json" -H "Content-Type: application/json" -d '{"player": "'"$player1"'", "move": "'"$move1"'"}' "$move1_url"
+echo "       curl -s -H \"Accept: application/hal+json\" -H \"Content-Type: application/json\" -d '{\"player\": \"$player1\", \"move\": \"$move1\"}' \"$move1_url\""
+curlwithcode -H "Accept: application/hal+json" -H "Content-Type: application/json" -d '{"player": "'"$player1"'", "move": "'"$move1"'"}' "$move1_url"
 echo "   Response: $status_code:"
 echo "$body" | pr -to 6
 
 
 # extract next move url from JSON body
 move2_url=$(echo "$body" | jq -r '._links.makeNextMove.href')
+move2_url="${move1_url/http:\/\/rps.example/$url}"
 
 # Make player 2's move
 echo ""
 echo "3. Make $player2's move: $move2"
 echo "   POST to /games/{game_id}, with data: "'{"player": "'"$player2"'", "move": "'"$move2"'"}'
-curlwithcode -H "Accept: application/json" -H "Content-Type: application/json" -d '{"player": "'"$player2"'", "move": "'"$move2"'"}' "$move2_url"
+echo "       curl -s -H \"Accept: application/hal+json\" -H \"Content-Type: application/json\" -d '{\"player\": \"$player2\", \"move\": \"$move2\"}' \"$move2_url\""
+curlwithcode -H "Accept: application/hal+json" -H "Content-Type: application/json" -d '{"player": "'"$player2"'", "move": "'"$move2"'"}' "$move2_url"
 echo "   Response: $status_code:"
 echo "$body" | pr -to 6
 
